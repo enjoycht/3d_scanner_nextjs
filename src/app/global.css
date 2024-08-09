@@ -1,0 +1,12 @@
+.header-link {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    text-decoration: none;
+    border-radius: 10px;
+    font-family:Verdana, Geneva, Tahoma, sans-serif
+}
+
+.header-link:hover {
+    background-color: #424247;
+    color: white
+}
