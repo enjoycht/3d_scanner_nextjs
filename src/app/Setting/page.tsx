@@ -1,8 +1,10 @@
+'use client';
 const Setting = () => {
     return (
-        <div>
+        <main className='d-flex'> 
             <h1>Setting</h1>
-        </div>
+        </main>
     );
 }
+
 export default Setting;

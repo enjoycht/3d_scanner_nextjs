@@ -1,8 +1,11 @@
+'use client';
+import React from 'react';
+
 const OTA = () => {
     return (
-        <div>
+        <main className='d-flex'> 
             <h1>OTA</h1>
-        </div>
+        </main>
     );
 }
 export default OTA;

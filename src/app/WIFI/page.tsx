@@ -1,8 +1,10 @@
+'use client';
 const WIFI = () => {
     return (
-        <div>
+        <main className='d-flex'> 
             <h1>WIFI</h1>
-        </div>
+        </main>
     );
 }
+
 export default WIFI;

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Header from "./compoent/header";
+import './global.css';
 
 export const metadata: Metadata = {
     title: "3D立體成型掃描機",
