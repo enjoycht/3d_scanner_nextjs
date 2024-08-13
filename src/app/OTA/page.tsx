@@ -1,10 +1,21 @@
 'use client';
 import React from 'react';
+import { Container, Row, Col, Card } from 'react-bootstrap';
 
 const OTA = () => {
     return (
         <main className='d-flex'> 
-            <h1>OTA</h1>
+            <Container className='flex-grow-1 d-flex'>
+                <div className='d-flex flex-grow-1'>
+                    <div className='d-flex flex-grow-1'>
+                        <Card bg="light" className='text-center flex-grow-1 my-5 mx-4'>
+                            <Card.Header>OTA</Card.Header>
+                            <Card.Body>
+                            </Card.Body>
+                        </Card>
+                    </div>
+                </div>
+            </Container>
         </main>
     );
 }

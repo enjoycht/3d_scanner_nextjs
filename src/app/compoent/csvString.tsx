@@ -12,12 +12,8 @@ const CsvString = (url: string) => {
                 Papa.parse(csvString, {
                     header: false,
                     complete: (results: ParseResult<string[]>) => {
-                        const parsedData = results.data.map((row: string[]) => parseFloat(row[0]));
-                        const chunkedData: number[][] = [];
-                        for (let i = 0; i < parsedData.length; i += 3) {
-                            chunkedData.push(parsedData.slice(i, i + 3));
-                        }
-                        setData(chunkedData);
+                        const parsedData = results.data.map((row: string[]) => row.map(value => parseFloat(value) * 1000));
+                        setData(parsedData);
                     }
                 });
             });
