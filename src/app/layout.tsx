@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { UrlProvider } from "./compoent/UrlContext";
 import Header from "./compoent/header";
 import './global.css';
 
@@ -13,11 +14,13 @@ export default function RootLayout({
         children: React.ReactNode;
     }>) {
     return (
-        <html lang="en">
-            <body>
-                <Header />
-                {children}
-            </body>
-        </html>
+        <UrlProvider>
+            <html lang="en">
+                <body>
+                    <Header />
+                    {children}
+                </body>
+            </html>
+        </UrlProvider>
     );
 }
