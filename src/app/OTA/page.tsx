@@ -1,8 +1,10 @@
 'use client';
 import React from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
+import { useUrl } from '../compoent/UrlContext';
 
 const OTA = () => {
+    const { url } = useUrl();
     return (
         <main className='d-flex'> 
             <Container className='flex-grow-1 d-flex'>
@@ -11,6 +13,7 @@ const OTA = () => {
                         <Card bg="light" className='text-center flex-grow-1 my-5 mx-4'>
                             <Card.Header>OTA</Card.Header>
                             <Card.Body>
+                                {`url: ${url}`}
                             </Card.Body>
                         </Card>
                     </div>

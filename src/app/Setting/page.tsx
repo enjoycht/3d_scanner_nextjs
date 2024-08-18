@@ -2,10 +2,10 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import { Container, Row, Col, Card, Form, Button, InputGroup } from 'react-bootstrap';
-
+import { useUrl } from '../compoent/UrlContext';
 
 const Setting = () => {
-    const url = window.location.host;
+    const { url } = useUrl();
     const [zAxisSteps, setZAxisSteps] = useState<number>(1);
 
     const [staPlaceholder, setStaPlaceholder] = useState<string>("");
@@ -43,8 +43,9 @@ const Setting = () => {
 
     
     useEffect(() => {
-        const socket = new WebSocket(`ws://${window.location.host}`);
-
+        console.log(url);
+        if(!url) {return;};
+        const socket = new WebSocket(`ws://${url}`);
         axios.get(`http://${url}/api/info`)
             .then(response => {
                 if (response.data) {
@@ -367,10 +368,12 @@ const Setting = () => {
                                                     <Form.Control
                                                         required
                                                         value={zAxisSteps}
-                                                        onChange={(e) => setZAxisSteps(isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value;
+                                                            setZAxisSteps(value === '' || isNaN(parseInt(value)) ? 1 : parseInt(value));
+                                                        }}
                                                         type="text"
                                                         placeholder="1"
-                                                        defaultValue="1"
                                                     />
                                                     <InputGroup.Text>微步</InputGroup.Text>
                                                 </InputGroup>
@@ -398,7 +401,6 @@ const Setting = () => {
                                                     type="text"
                                                     value={zAxisCorrentPosition}
                                                     onChange={(e) => setZAxisCorrentPosition(isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
-                                                    defaultValue="800"
                                                 />
                                                 <InputGroup.Text> / 47000</InputGroup.Text>
                                             </InputGroup>
@@ -412,7 +414,6 @@ const Setting = () => {
                                                     type="text"
                                                     value={laserDistance}
                                                     onChange={(e) => setLaserDistance(isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
-                                                    defaultValue="800"
                                                 />
                                                 <InputGroup.Text>mm</InputGroup.Text>
                                             </InputGroup>
