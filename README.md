@@ -4,3 +4,4 @@
 ![Static Badge](https://img.shields.io/badge/nextjs-14.2.5-green?logo=nextdotjs)
 ![Static Badge](https://img.shields.io/badge/bootstrap-5.3.3-green?logo=bootstrap)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/MakerbaseMoon/3d_scanner_nextjs/nextjs.yml?logo=github&label=Github%20Page)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/MakerbaseMoon/3d_scanner_nextjs/release.yml?logo=github&label=Release)
