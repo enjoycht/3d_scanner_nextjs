@@ -45,7 +45,7 @@ const Setting = () => {
     useEffect(() => {
         console.log(url);
         if(!url) {return;};
-        const socket = new WebSocket(`ws://${url}`);
+        const socket = new WebSocket(`ws://${url}/ws`);
         axios.get(`http://${url}/api/info`)
             .then(response => {
                 if (response.data) {
@@ -75,18 +75,12 @@ const Setting = () => {
         });
         
         // Listen for messages
-        socket.addEventListener('message', (event) => {
+        socket.addEventListener('message', (event: MessageEvent) => {
             const message = JSON.parse(event.data);
-            switch (message.type) {
-                case 'updateZAxisPosition':
-                    setZAxisCorrentPosition(message.zAxisPosition);
-                    break;
-                case 'updateLaserDistance':
-                    setLaserDistance(message.laserDistance);
-                    break;
-                default:
-                    console.log('Unknown message type:', message.type);
-            }
+            console.log('Message from server: ', message.z_steps);
+            setZAxisCorrentPosition(message.z_steps);
+            setLaserDistance(message.vl53l1x);
+            // setLaserDistance(message.);
         });
         
         // Connection closed
@@ -108,7 +102,9 @@ const Setting = () => {
 
     const saveButtonClick = () => {
         console.log('Save Setting');
-        axios.get(`http://${url}/api/set/scanner?command=save`)
+        // /api/set/data?sta_ssid=<sta_ssid>&sta_password=<sta_password>&ap_ssid=<ap_ssid>&ap_password=<ap_password>&mdns=<mdns>&github_username=<github_username>&github_repo=<github_repo>&z_axis_max=<z_axis_max>&z_axis_start_step=<z_axis_start_step>&z_axis_delay_time=<z_axis_delay_time>&z_axis_one_time_step=<z_axis_one_time_step>&x_y_axis_max=<x_y_axis_max>&x_y_axis_step_delay_time=<x_y_axis_step_delay_time>&x_y_axis_one_time_step=<x_y_axis_one_time_step>&vl53l1x_center=<vl53l1x_center>&vl53l1x_timeing_budget=<vl53l1x_timeing_budget>
+        console.log('save url: ', `http://${url}/api/set/data?z_axis_max=${zAxisMaxDefault=== undefined ? zAxisMaxPlaceholder : zAxisMaxDefault}&z_axis_start_step=${zAxisStepDefault === undefined ? zAxisStepPlaceholder : zAxisStepDefault}&z_axis_delay_time=${zAxisSpeedDefault === undefined ? zAxisSpeedPlaceholder : zAxisSpeedDefault}&z_axis_one_time_step=${zAxisCorrectionDefault === undefined ? zAxisCorrectionPlaceholder : zAxisCorrectionDefault}&x_y_axis_max=${xyStepDefault === undefined ? xyStepPlaceholder : xyStepDefault}&x_y_axis_step_delay_time=${xyStepPerStepDefault === undefined ? xyStepPerStepPlaceholder: xyStepPerStepDefault}&x_y_axis_one_time_step=${xySpeedDefault === undefined ? xySpeedPlaceholder : xySpeedDefault}&vl53l1x_center=${laserCenterDefault === undefined ? laserCenterPlaceholder : laserCenterDefault}&vl53l1x_timeing_budget=${timingBudgetDefault}`);
+        axios.get(`http://${url}/api/set/data?z_axis_max=${zAxisMaxDefault=== undefined ? zAxisMaxPlaceholder : zAxisMaxDefault}&z_axis_start_step=${zAxisStepDefault === undefined ? zAxisStepPlaceholder : zAxisStepDefault}&z_axis_delay_time=${zAxisSpeedDefault === undefined ? zAxisSpeedPlaceholder : zAxisSpeedDefault}&z_axis_one_time_step=${zAxisCorrectionDefault === undefined ? zAxisCorrectionPlaceholder : zAxisCorrectionDefault}&x_y_axis_max=${xyStepDefault === undefined ? xyStepPlaceholder : xyStepDefault}&x_y_axis_step_delay_time=${xyStepPerStepDefault === undefined ? xyStepPerStepPlaceholder: xyStepPerStepDefault}&x_y_axis_one_time_step=${xySpeedDefault === undefined ? xySpeedPlaceholder : xySpeedDefault}&vl53l1x_center=${laserCenterDefault === undefined ? laserCenterPlaceholder : laserCenterDefault}&vl53l1x_timeing_budget=${timingBudgetDefault}`)
             .then(response => {
                 if (response.data) {
                     console.log('ESP32 Data:', response.data);
@@ -168,64 +164,6 @@ const Setting = () => {
                             <Card.Header className='fs-2'>Setting</Card.Header>
                             <Card.Body>
                                 <Container>
-                                    <Row className='py-2'>
-                                        <Form.Group as={Col} md="6">
-                                            <Form.Label>STA 帳號</Form.Label>
-                                            <Form.Control
-                                                required
-                                                type="text"
-                                                placeholder={staPlaceholder}
-                                                defaultValue={staDefault}
-                                                onChange={(e) => setStaDefault(e.target.value)}
-                                            />
-                                        </Form.Group>
-                                        <Form.Group as={Col} md="6">
-                                            <Form.Label>STA 密碼</Form.Label>
-                                            <Form.Control
-                                                required
-                                                type="text"
-                                                placeholder={staPasswordPlaceholder}
-                                                defaultValue={staPasswordDefault}
-                                                onChange={(e) => setStaPasswordDefault(e.target.value)}
-                                            />
-                                        </Form.Group>
-                                    </Row>
-                                    <Row className='py-2'>
-                                        <Form.Group as={Col} md="6">
-                                            <Form.Label>AP 帳號</Form.Label>
-                                            <Form.Control
-                                                required
-                                                type="text"
-                                                placeholder={apPlaceholder}
-                                                defaultValue={apDefault}
-                                                onChange={(e) => setApDefault(e.target.value)}
-                                            />
-                                        </Form.Group>
-                                        <Form.Group as={Col} md="6">
-                                            <Form.Label>AP 密碼</Form.Label>
-                                            <Form.Control
-                                                required
-                                                type="text"
-                                                placeholder={apPasswordPlaceholder}
-                                                defaultValue={apPasswordDefault}
-                                                onChange={(e) => setApPasswordDefault(e.target.value)}
-                                            />
-                                            </Form.Group>
-                                        
-                                    </Row>
-                                    <Row className='py-2'>
-                                        <Form.Group as={Col} md="12">
-                                            <Form.Label>ESP32 名稱</Form.Label>
-                                            <Form.Control
-                                            required
-                                            type="text"
-                                            placeholder={esp32HostnamePlaceholder}
-                                            defaultValue={esp32HostnameDefault}
-                                            onChange={(e) => setEsp32HostnameDefault(e.target.value)}
-                                            />
-                                        </Form.Group>
-                                        <div className="border-bottom border-2 p-2" />
-                                    </Row>
                                     <Row className='py-2'>
                                         <Form.Group as={Col} md="6">
                                             <Form.Label>Z軸最大值</Form.Label>
@@ -385,7 +323,7 @@ const Setting = () => {
                                             
                                         </Col>
                                         <Col md={2}>
-                                            <Button onClick={zAxisHomeButtonClick} className='mt-4' size="lg">Z軸 回家</Button>
+                                            <Button onClick={zAxisHomeButtonClick} className='mt-4' size="lg">Z軸 歸位</Button>
                                         </Col>
                                         <Col md={2}>
                                             <Button onClick={zAxisDownButtonClick} className='mt-4' size="lg"> Z軸 往下</Button>
