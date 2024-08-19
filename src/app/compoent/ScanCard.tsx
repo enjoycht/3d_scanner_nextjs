@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Card, Row, Col, FormCheck, Form, FormLabel, FormSelect, Button } from 'react-bootstrap';
 import Image from 'next/image';
 import CsvString from './csvString';
@@ -18,7 +18,15 @@ interface ScanModeProps {
 }
 
 const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, angle, handleAngleChange, isPaused, togglePause, rendererRef, sceneRef, cameraRef }) => {
-    const points = CsvString('/point.csv');  
+    const url  = window.location.host;
+    const [scanning, setScanning] = useState(false);
+    const [paused, setPaused] = useState(false);
+    const [continued, setContinued] = useState(false);
+    const [end, setEnd] = useState(false);
+
+    const [ws, setWs] = useState<WebSocket | null>(null);
+
+    const points = CsvString('/point.csv'); 
     const saveSvg = () => {
         if (rendererRef.current && sceneRef.current && cameraRef.current) {
             rendererRef.current.render(sceneRef.current, cameraRef.current);
@@ -44,6 +52,49 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
         }
     };
 
+    useEffect(() => {
+        const socket = new WebSocket(`ws://${url}`);
+        socket.addEventListener('open', (event) => {
+            console.log('WebSocket is open now.');
+        });
+        
+        // Listen for messages
+        socket.addEventListener('message', (event) => {
+            const message = JSON.parse(event.data);
+            console.log('Message from server ', message);
+        });
+        
+        // Connection closed
+        socket.addEventListener('close', (event) => {
+            console.log('WebSocket is closed now.');
+        });
+        
+        // Handle errors
+        socket.addEventListener('error', (event) => {
+            console.error('WebSocket error observed:', event);
+        });
+        
+        setWs(socket);
+    }, [url]);
+
+    const handleStart = () => {
+        setScanning(true);
+        setPaused(true);
+    };
+
+    const handlePause = () => {
+        setPaused(true);
+    };
+
+    const handleResume = () => {
+        setPaused(false);
+    };
+
+    const handleEnd = () => {
+        setScanning(false);
+        setPaused(false);
+    };
+
     return (
         <Card bg="light" className='text-center d-flex flex-grow-1 my-5 mx-4'>
             <Card.Header className='fs-2 fw-bold'>3D立體成型掃描機</Card.Header>
@@ -54,7 +105,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
                 <Row>
                     <Col>
                         <Form>
-                            <FormLabel className='fs-3 mt-4 fw-bold'>{isPointAnimation ? '自動模式' : '手動模式'}</FormLabel>
+                            <FormLabel className='fs-3 mt-4 fw-bold'>{isPointAnimation ? '掃描模式' : '自動模式'}</FormLabel>
                             <FormCheck 
                                 type='switch' 
                                 id='mode-switch'
@@ -65,6 +116,46 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
                     </Col>
                 </Row>
                 {isPointAnimation ? (
+                    <>
+                        <Row>
+                            <Col>
+                            {!scanning && (
+                                <div>
+                                    <Form.Control type='text' placeholder='專案名稱' className='mt-4'></Form.Control>
+                                    <Button className='mt-4'  size="lg" variant="success" onClick={handleStart}>
+                                        開始
+                                    </Button>
+                                </div>
+                            )}
+                            </Col>
+                        </Row>
+                        {scanning && (
+                            <>
+                                <Row>
+                                    <Col>
+                                    {!paused ? (
+                                        <Button className='mt-4' size="lg" variant="info" onClick={handlePause}>
+                                            暫停
+                                        </Button>
+                                    ) : (
+                                        <Button className='mt-4' size="lg" onClick={handleResume} >
+                                            繼續
+                                        </Button>
+                                    )}
+                                    </Col>
+                                </Row>     
+                                                
+                                <Row>
+                                    <Col>
+                                        <Button className='mt-4' size="lg" variant="danger" onClick={handleEnd}>
+                                            結束
+                                        </Button>
+                                    </Col>
+                                </Row>
+                            </>
+                        )}
+                    </>
+                ) : (
                     <>
                         <Row>
                             <Col>
@@ -91,24 +182,6 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
                         <Row>
                             <Col>
                                 <FormLabel className='fw-bold fs-3 mt-4'>選擇角度</FormLabel>
-                                <FormSelect value={angle} onChange={handleAngleChange}>
-                                    <option value="up">上</option>
-                                    <option value="down">下</option>
-                                    <option value="left">左</option>
-                                    <option value="right">右</option>
-                                    <option value="top-left">左上</option>
-                                    <option value="bottom-left">左下</option>
-                                    <option value="top-right">右上</option>
-                                    <option value="bottom-right">右下</option>
-                                </FormSelect>
-                            </Col>
-                        </Row>
-                    </>
-                ) : (
-                    <>
-                        <Row>
-                            <Col>
-                                <FormLabel>選擇角度</FormLabel>
                                 <FormSelect value={angle} onChange={handleAngleChange}>
                                     <option value="up">上</option>
                                     <option value="down">下</option>

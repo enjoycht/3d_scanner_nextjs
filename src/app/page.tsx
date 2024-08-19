@@ -80,7 +80,7 @@ export default function Home() {
                         />
                     </Col>
                     <Col md={9} className="d-flex">
-                        {!isPointAnimation ? <ScanControls angle={angle} /> : <PointAnimation angle={angle} isPaused={isPaused} rendererRef={rendererRef} sceneRef={sceneRef} cameraRef={cameraRef} />}
+                        {isPointAnimation ? <ScanControls angle={angle} /> : <PointAnimation angle={angle} isPaused={isPaused} rendererRef={rendererRef} sceneRef={sceneRef} cameraRef={cameraRef} />}
                     </Col>
                 </Row>
             </Container>
