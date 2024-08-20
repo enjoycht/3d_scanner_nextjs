@@ -48,6 +48,7 @@ const Setting = () => {
                 if (response.data) {
                     console.log('ESP32 Data:', response.data);
                     setModuleDataP(response.data['data']['module']);
+                    setModuleChange('vl53l1x_timeing_budget', response.data['data']['module']['vl53l1x_timeing_budget']);
                 }
             })
             .catch(error => {
@@ -281,7 +282,7 @@ const Setting = () => {
                                         <Form.Group as={Col} md="6">
                                             <Form.Label>雷射 Timeing Budget</Form.Label>
                                             <InputGroup className="mb-3">
-                                                <Form.Select defaultValue={moduleDataP.vl53l1x_timeing_budget} 
+                                                <Form.Select defaultValue="" value={moduleData.vl53l1x_timeing_budget}
                                                     onChange={(e) => setModuleChange('vl53l1x_timeing_budget', e.target.value)}> 
                                                     <option>15</option>
                                                     <option>20</option>
