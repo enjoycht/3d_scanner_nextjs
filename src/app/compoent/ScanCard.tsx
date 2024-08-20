@@ -28,7 +28,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
 
     const [ws, setWs] = useState<WebSocket | null>(null);
     
-    const points = CsvString('/point.csv'); 
+    const points = CsvString(`ws://${url}/ws`)
 
     const saveSvg = () => {
         if (rendererRef.current && sceneRef.current && cameraRef.current) {

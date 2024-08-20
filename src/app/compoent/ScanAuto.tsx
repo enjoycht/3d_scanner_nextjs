@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import CsvString from './csvString';
+import { useUrl } from '../compoent/UrlContext';
 
 interface ScanAutoProps {
     angle: String;
@@ -14,8 +15,11 @@ interface ScanAutoProps {
 }
 
 const PointAnimation: React.FC<ScanAutoProps> = ({ angle, isPaused, rendererRef, sceneRef, cameraRef  }) => {
+    const { url } = useUrl();
     const mountRef = useRef<HTMLDivElement>(null);
-    const points = CsvString('/point.csv');  
+    // const points = CsvString('/point.csv');  
+
+    const points = CsvString(`ws://${url}/ws`)
     //旋轉角度
     const cubeRotationRef = useRef({ z: 0 });
     const pointCloudRotationRef = useRef({ z: 0 });
