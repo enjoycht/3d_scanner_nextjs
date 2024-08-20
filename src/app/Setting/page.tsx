@@ -6,49 +6,48 @@ import { useUrl } from '../compoent/UrlContext';
 
 const Setting = () => {
     const { url } = useUrl();
-    const [zAxisSteps, setZAxisSteps] = useState<number>(1);
-
-    const [zAxisMaxPlaceholder, setZAxisMaxPlaceholder] = useState<string>("");
-    const [zAxisStepPlaceholder, setZAxisStepPlaceholder] = useState<string>("");
-    const [zAxisSpeedPlaceholder, setZAxisSpeedPlaceholder] = useState<string>("");
-    const [zAxisCorrectionPlaceholder, setZAxisCorrectionPlaceholder] = useState<string>("");
-    const [xyStepPlaceholder, setXyStepPlaceholder] = useState<string>("");
-    const [xyStepPerStepPlaceholder, setXyStepPerStepPlaceholder] = useState<string>("");
-    const [xySpeedPlaceholder, setXySpeedPlaceholder] = useState<string>("");
-    const [laserCenterPlaceholder, setLaserCenterPlaceholder] = useState<string>("");
-
-    const [zAxisMaxDefault, setZAxisMaxDefault] = useState<number>();
-    const [zAxisStepDefault, setZAxisStepDefault] = useState<number>();
-    const [zAxisSpeedDefault, setZAxisSpeedDefault] = useState<number>();
-    const [zAxisCorrectionDefault, setZAxisCorrectionDefault] = useState<number>();
-    const [xyStepDefault, setXyStepDefault] = useState<number>();
-    const [xyStepPerStepDefault, setXyStepPerStepDefault] = useState<number>();
-    const [xySpeedDefault, setXySpeedDefault] = useState<number>();
-    const [laserCenterDefault, setLaserCenterDefault] = useState<number>();
-    const [timingBudgetDefault, setTimingBudgetDefault] = useState<number>(15);
-    
-    const [zAxisCorrentPosition, setZAxisCorrentPosition] = useState<number>();
-    const [laserDistance, setLaserDistance] = useState<number>();
     const [ws, setWs] = useState<WebSocket | null>(null);
 
-    
+    const [message, setMessage] = useState({
+        z_axis: 0,
+        vl53l1x: 0
+    });
+
+    const [zAxisSteps, setZAxisSteps] = useState(0);
+    const [moduleData, setModuleData] = useState({
+        z_axis_max: "",
+        z_axis_one_time_step: "",
+        z_axis_delay_time: "",
+        z_axis_start_step: "",
+        x_y_axis_max: "",
+        x_y_axis_check_times: "",
+        x_y_axis_one_time_step: "",
+        x_y_axis_step_delay_time: "",
+        vl53l1x_center: "",
+        vl53l1x_timeing_budget: ""
+    });
+
+    const [moduleDataP, setModuleDataP] = useState({
+        z_axis_max: "",
+        z_axis_one_time_step: "",
+        z_axis_delay_time: "",
+        z_axis_start_step: "",
+        x_y_axis_max: "",
+        x_y_axis_check_times: "",
+        x_y_axis_one_time_step: "",
+        x_y_axis_step_delay_time: "",
+        vl53l1x_center: "",
+        vl53l1x_timeing_budget: ""
+    });
+
     useEffect(() => {
-        console.log(url);
-        if(!url) {return;};
+        if(!url || url === "" || url === undefined) {return;};
         const socket = new WebSocket(`ws://${url}/ws`);
         axios.get(`http://${url}/api/info`)
             .then(response => {
                 if (response.data) {
                     console.log('ESP32 Data:', response.data);
-                    setZAxisMaxPlaceholder(response.data['data']['module']['z_axis_max']);
-                    setZAxisStepPlaceholder(response.data['data']['module']['z_axis_one_time_step']);
-                    setZAxisSpeedPlaceholder(response.data['data']['module']['z_axis_delay_time']);
-                    setZAxisCorrectionPlaceholder(response.data['data']['module']['z_axis_start_step']);
-                    setXyStepPlaceholder(response.data['data']['module']['x_y_axis_max']);
-                    setXyStepPerStepPlaceholder(response.data['data']['module']['x_y_axis_one_time_step']);
-                    setXySpeedPlaceholder(response.data['data']['module']['x_y_axis_step_delay_time']);
-                    setLaserCenterPlaceholder(response.data['data']['module']['vl53l1x_center']); 
-                    setTimingBudgetDefault(response.data['data']['module']['vl53l1x_timeing_budget']);
+                    setModuleDataP(response.data['data']['module']);
                 }
             })
             .catch(error => {
@@ -61,9 +60,7 @@ const Setting = () => {
         
         // Listen for messages
         socket.addEventListener('message', (event: MessageEvent) => {
-            const message = JSON.parse(event.data);
-            setZAxisCorrentPosition(message.z_steps);
-            setLaserDistance(message.vl53l1x);
+            setMessage(JSON.parse(event.data));
         });
         
         // Connection closed
@@ -84,19 +81,17 @@ const Setting = () => {
     }, [url]);
 
     const saveButtonClick = () => {
-        console.log('Save Setting');
-        const zAxisMax = zAxisMaxDefault === undefined ? zAxisMaxPlaceholder : zAxisMaxDefault;
-        const zAxisStep = zAxisStepDefault === undefined ? zAxisStepPlaceholder : zAxisStepDefault;
-        const zAxisSpeed = zAxisSpeedDefault === undefined ? zAxisSpeedPlaceholder : zAxisSpeedDefault;
-        const zAxisCorrection = zAxisCorrectionDefault === undefined ? zAxisCorrectionPlaceholder : zAxisCorrectionDefault;
-        const xyStep = xyStepDefault === undefined ? xyStepPlaceholder : xyStepDefault;
-        const xyStepPerStep = xyStepPerStepDefault === undefined ? xyStepPerStepPlaceholder: xyStepPerStepDefault;
-        const xySpeed = xySpeedDefault === undefined ? xySpeedPlaceholder : xySpeedDefault;
-        const laserCenter = laserCenterDefault === undefined ? laserCenterPlaceholder : laserCenterDefault;
-        const timingBudget = timingBudgetDefault;
-
-        console.log('save url: ', `http://${url}/api/set/data?z_axis_max=${zAxisMax}&z_axis_start_step=${zAxisStep}&z_axis_delay_time=${zAxisSpeed}&z_axis_one_time_step=${zAxisCorrection}&x_y_axis_max=${xyStep}&x_y_axis_step_delay_time=${xyStepPerStep}&x_y_axis_one_time_step=${xySpeed}&vl53l1x_center=${laserCenter}&vl53l1x_timeing_budget=${timingBudget}`);
-        axios.get(`http://${url}/api/set/data?z_axis_max=${zAxisMax}&z_axis_start_step=${zAxisStep}&z_axis_delay_time=${zAxisSpeed}&z_axis_one_time_step=${zAxisCorrection}&x_y_axis_max=${xyStep}&x_y_axis_step_delay_time=${xyStepPerStep}&x_y_axis_one_time_step=${xySpeed}&vl53l1x_center=${laserCenter}&vl53l1x_timeing_budget=${timingBudget}`)
+        let param = "";
+        for (const key in moduleData) {
+            if (moduleData[key as keyof typeof moduleData] === ""){
+                param += `${key}=${moduleDataP[key as keyof typeof moduleDataP]}&`;
+            } else {
+                param += `${key}=${moduleData[key as keyof typeof moduleData]}&`;
+            }
+        }
+        param = param.slice(0, -1);
+        console.log(`Save Setting: ${param}`);
+        axios.get(`http://${url}/api/set/data?${param}`)
             .then(response => {
                 if (response.data) {
                     console.log('ESP32 Data:', response.data);
@@ -146,6 +141,9 @@ const Setting = () => {
             });
     }
 
+    const setModuleChange = (key: string, value: string) => {
+        setModuleData(prevData => { return { ...prevData, [key]: value } });
+    }
 
     return (
         <main className='d-flex'> 
@@ -163,9 +161,9 @@ const Setting = () => {
                                                 <Form.Control
                                                     required
                                                     type="text"
-                                                    placeholder={zAxisMaxPlaceholder}
-                                                    defaultValue={zAxisMaxDefault}
-                                                    onChange={(e) => setZAxisMaxDefault(parseInt(e.target.value))}
+                                                    placeholder={moduleDataP.z_axis_max}
+                                                    defaultValue={moduleData.z_axis_max}
+                                                    onChange={(e) => setModuleChange('z_axis_max', e.target.value)}
                                                 />
                                                 <InputGroup.Text>微步</InputGroup.Text>
                                             </InputGroup>
@@ -176,9 +174,9 @@ const Setting = () => {
                                                 <Form.Control
                                                     required
                                                     type="text"
-                                                    placeholder={zAxisStepPlaceholder}
-                                                    defaultValue={zAxisStepDefault}
-                                                    onChange={(e) => setZAxisStepDefault(parseInt(e.target.value))}
+                                                    placeholder={moduleDataP.z_axis_one_time_step}
+                                                    defaultValue={moduleData.z_axis_one_time_step}
+                                                    onChange={(e) => setModuleChange('z_axis_one_time_step', e.target.value)}
                                                 />
                                                 <InputGroup.Text>微步</InputGroup.Text>
                                                 </InputGroup>
@@ -189,9 +187,9 @@ const Setting = () => {
                                                 <Form.Control
                                                     required
                                                     type="text"
-                                                    placeholder={zAxisSpeedPlaceholder}
-                                                    defaultValue={zAxisSpeedDefault}
-                                                    onChange={(e) => setZAxisSpeedDefault(parseInt(e.target.value))}
+                                                    placeholder={moduleDataP.z_axis_delay_time}
+                                                    defaultValue={moduleData.z_axis_delay_time}
+                                                    onChange={(e) => setModuleChange('z_axis_delay_time', e.target.value)}
                                                 />
                                                 <InputGroup.Text>delayMicroseconds</InputGroup.Text>
                                             </InputGroup>
@@ -202,9 +200,9 @@ const Setting = () => {
                                                 <Form.Control
                                                     required
                                                     type="text"
-                                                    placeholder={zAxisCorrectionPlaceholder}
-                                                    defaultValue={zAxisCorrectionDefault}
-                                                    onChange={(e) => setZAxisCorrectionDefault(parseInt(e.target.value))}
+                                                    placeholder={moduleDataP.z_axis_start_step}
+                                                    defaultValue={moduleData.z_axis_start_step}
+                                                    onChange={(e) => setModuleChange('z_axis_start_step', e.target.value)}
                                                 />
                                                 <InputGroup.Text>微步</InputGroup.Text>
                                             </InputGroup>
@@ -212,45 +210,59 @@ const Setting = () => {
                                         <div className="border-bottom border-2 p-2" />
                                     </Row>
                                     <Row className='py-2'> 
-                                        <Form.Group as={Col} md="4">
+                                        <Form.Group as={Col} md="6">
                                             <Form.Label>X Y軸1圈微步</Form.Label>
                                                 <InputGroup className="mb-3">
                                                     <Form.Control
                                                         required
                                                         type="text"
-                                                        placeholder={xyStepPlaceholder}
-                                                        defaultValue={xyStepDefault}
-                                                        onChange={(e) => setXyStepDefault(parseInt(e.target.value))}
+                                                        placeholder={moduleDataP.x_y_axis_max}
+                                                        defaultValue={moduleData.x_y_axis_max}
+                                                        onChange={(e) => setModuleChange('x_y_axis_max', e.target.value)}
                                                     />
                                                     <InputGroup.Text>微步</InputGroup.Text>
                                                 </InputGroup>
                                         </Form.Group>
-                                        <Form.Group as={Col} md="4">
+                                        <Form.Group as={Col} md="6">
                                             <Form.Label>X Y軸每次上升微步</Form.Label>
                                             <InputGroup className="mb-3">
                                                 <Form.Control
                                                     required
                                                     type="text"
-                                                    placeholder={xyStepPerStepPlaceholder}
-                                                    defaultValue={xyStepPerStepDefault}
-                                                    onChange={(e) => setXyStepPerStepDefault(parseInt(e.target.value))}
+                                                    placeholder={moduleDataP.x_y_axis_one_time_step}
+                                                    defaultValue={moduleData.x_y_axis_one_time_step}
+                                                    onChange={(e) => setModuleChange('x_y_axis_one_time_step', e.target.value)}
                                                 />
                                                 <InputGroup.Text>微步</InputGroup.Text>
                                                 </InputGroup>
                                         </Form.Group>
-                                        <Form.Group as={Col} md="4">
+                                        <Form.Group as={Col} md="6">
                                             <Form.Label>X Y軸速度</Form.Label>
                                             <InputGroup className="mb-3">
                                                 <Form.Control
                                                     required
                                                     type="text"
-                                                    placeholder={xySpeedPlaceholder}
-                                                    defaultValue={xySpeedDefault}
-                                                    onChange={(e) => setXySpeedDefault(parseInt(e.target.value))}
+                                                    placeholder={moduleDataP.x_y_axis_step_delay_time}
+                                                    defaultValue={moduleData.x_y_axis_step_delay_time}
+                                                    onChange={(e) => setModuleChange('x_y_axis_step_delay_time', e.target.value)}
                                                 />
                                                 <InputGroup.Text>delayMicroseconds</InputGroup.Text>
                                             </InputGroup>
                                         </Form.Group>
+                                        <Form.Group as={Col} md="6">
+                                            <Form.Label>X Y軸掃描次數</Form.Label>
+                                            <InputGroup className="mb-3">
+                                                <Form.Control
+                                                    required
+                                                    type="text"
+                                                    placeholder={moduleDataP.x_y_axis_check_times}
+                                                    defaultValue={moduleData.x_y_axis_check_times}
+                                                    onChange={(e) => setModuleChange('x_y_axis_check_times', e.target.value)}
+                                                />
+                                                <InputGroup.Text>次</InputGroup.Text>
+                                            </InputGroup>
+                                        </Form.Group>
+                                        <div className="border-bottom border-2 p-2" />
                                     </Row>
                                     <Row className='py-2'>
                                         <Form.Group as={Col} md="6">
@@ -259,9 +271,9 @@ const Setting = () => {
                                                 <Form.Control
                                                     required
                                                     type="text"
-                                                    placeholder={laserCenterPlaceholder}
-                                                    defaultValue={laserCenterDefault}
-                                                    onChange={(e) => setLaserCenterDefault(parseInt(e.target.value))}
+                                                    placeholder={moduleDataP.vl53l1x_center}
+                                                    defaultValue={moduleData.vl53l1x_center}
+                                                    onChange={(e) => setModuleChange('vl53l1x_center', e.target.value)}
                                                 />
                                                 <InputGroup.Text>mm</InputGroup.Text>
                                             </InputGroup>
@@ -269,8 +281,8 @@ const Setting = () => {
                                         <Form.Group as={Col} md="6">
                                             <Form.Label>雷射 Timeing Budget</Form.Label>
                                             <InputGroup className="mb-3">
-                                                <Form.Select defaultValue={timingBudgetDefault} 
-                                                    onChange={(e) => setTimingBudgetDefault(isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}> 
+                                                <Form.Select defaultValue={moduleDataP.vl53l1x_timeing_budget} 
+                                                    onChange={(e) => setModuleChange('vl53l1x_timeing_budget', e.target.value)}> 
                                                     <option>15</option>
                                                     <option>20</option>
                                                     <option>33</option>
@@ -329,8 +341,8 @@ const Setting = () => {
                                                     required
                                                     disabled
                                                     type="text"
-                                                    value={zAxisCorrentPosition}
-                                                    onChange={(e) => setZAxisCorrentPosition(isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
+                                                    value={message.z_axis}
+                                                    onChange={(e) => (isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
                                                 />
                                                 <InputGroup.Text> / 47000</InputGroup.Text>
                                             </InputGroup>
@@ -342,8 +354,8 @@ const Setting = () => {
                                                     required
                                                     disabled
                                                     type="text"
-                                                    value={laserDistance}
-                                                    onChange={(e) => setLaserDistance(isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
+                                                    value={message.vl53l1x}
+                                                    onChange={(e) => (isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
                                                 />
                                                 <InputGroup.Text>mm</InputGroup.Text>
                                             </InputGroup>
