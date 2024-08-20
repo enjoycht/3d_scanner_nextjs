@@ -56,6 +56,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
     };
 
     useEffect(() => {
+        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         const socket = new WebSocket(`ws://${url}/ws`);
         socket.addEventListener('open', (event) => {
             console.log('WebSocket is open now.');
@@ -81,6 +82,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
         setScanning(true);
         setPaused(true);
         setShowPoints(true); // Show points when scanning starts
+        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         axios.get(`http://${url}/api/set/scanner?command=new&name=${projectName}`)
             .then((response) => {
                 console.log(response);
@@ -91,6 +93,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
     };
 
     const handlePause = () => {
+        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         setPaused(true);
         axios.get(`http://${url}/api/set/scanner?command=stop`)
             .then((response) => {
@@ -102,6 +105,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
     };
 
     const handleResume = () => {
+        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         setPaused(false);
         axios.get(`http://${url}/api/set/scanner?command=start`)
             .then((response) => {
@@ -113,6 +117,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
     };
 
     const handleEnd = () => {
+        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         setScanning(false);
         setPaused(false);
         setShowPoints(false); // Hide points when scanning ends

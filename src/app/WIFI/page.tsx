@@ -20,7 +20,7 @@ const WiFi = () => {
     const [esp32HostnameDefault, setEsp32HostnameDefault] = useState<string>("");
 
     useEffect(() => {
-        if (!url) return;
+        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         axios.get(`http://${url}/api/info`)
             .then(response => {
                 if (response.data) {
@@ -48,6 +48,7 @@ const WiFi = () => {
         console.log(staSSID, staPassword, apSSID, apPassword, mdns);
         console.log('wifi url: ', `http://${url}/api/set/data?sta_ssid=${staSSID}&sta_password=${staPassword}&ap_ssid=${apSSID}&ap_password=${apPassword}&mdns=${mdns}`);
         
+        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         axios.get(`http://${url}/api/set/data?sta_ssid=${staSSID}&sta_password=${staPassword}&ap_ssid=${apSSID}&ap_password=${apPassword}&mdns=${mdns}`)
             .then(response => {
                 if (response.data) {

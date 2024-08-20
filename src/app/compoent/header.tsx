@@ -16,15 +16,15 @@ const Header = () => {
     };
 
     useEffect(() => {
-        if (url) {
-            axios.get(`http://${url}/api/info`)
-                .then(response => {
-                    setVersion(response.data["version"]);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-        }
+        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
+        axios.get(`http://${url}/api/info`)
+            .then(response => {
+                setVersion(response.data["version"]);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+
     }, [url]);
 
     return (

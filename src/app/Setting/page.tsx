@@ -41,7 +41,7 @@ const Setting = () => {
     });
 
     useEffect(() => {
-        if(!url || url === "" || url === undefined) {return;};
+        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         const socket = new WebSocket(`ws://${url}/ws`);
         axios.get(`http://${url}/api/info`)
             .then(response => {
@@ -89,6 +89,7 @@ const Setting = () => {
         }
         param = param.slice(0, -1);
         console.log(`Save Setting: ${param}`);
+        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         axios.get(`http://${url}/api/set/data?${param}`)
             .then(response => {
                 if (response.data) {
@@ -102,6 +103,7 @@ const Setting = () => {
  
     const zAxisUpButtonClick = () => {
         console.log(`Z Axis Up: ${zAxisSteps}steps`);
+        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         axios.get(`http://${url}/api/set/scanner?command=up&step=${zAxisSteps}`)
             .then(response => {
                 if (response.data) {
@@ -115,6 +117,7 @@ const Setting = () => {
 
     const zAxisDownButtonClick = () => {
         console.log(`Z Axis Down: ${zAxisSteps}steps`);
+        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         axios.get(`http://${url}/api/set/scanner?command=down&step=${zAxisSteps}`)
             .then(response => {
                 if (response.data) {
@@ -128,6 +131,7 @@ const Setting = () => {
 
     const zAxisHomeButtonClick = () => {
         console.log('Z Axis Home');
+        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         axios.get(`http://${url}/api/set/scanner?command=home`)
             .then(response => {
                 if (response.data) {
