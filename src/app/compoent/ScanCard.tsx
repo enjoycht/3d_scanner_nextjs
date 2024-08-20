@@ -60,19 +60,16 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
         socket.addEventListener('open', (event) => {
             console.log('WebSocket is open now.');
         });
-        
-        // Listen for messages
+
         socket.addEventListener('message', (event) => {
             const message = JSON.parse(event.data);
             console.log('Message from server ', message);
         });
         
-        // Connection closed
         socket.addEventListener('close', (event) => {
             console.log('WebSocket is closed now.');
         });
         
-        // Handle errors
         socket.addEventListener('error', (event) => {
             console.error('WebSocket error observed:', event);
         });

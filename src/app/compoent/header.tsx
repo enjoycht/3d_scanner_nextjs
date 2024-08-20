@@ -13,11 +13,9 @@ const Header = () => {
 
     const handleButtonClick = () => {
         setUrl(inputUrl);
-        console.log('URL updated to:', inputUrl);
     };
 
     useEffect(() => {
-        console.log('Current URL:', url);
         if (url) {
             axios.get(`http://${url}/api/info`)
                 .then(response => {

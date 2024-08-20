@@ -59,17 +59,14 @@ const Setting = () => {
             console.log('WebSocket is open now.');
         });
         
-        // Listen for messages
         socket.addEventListener('message', (event: MessageEvent) => {
             setMessage(JSON.parse(event.data));
         });
-        
-        // Connection closed
+
         socket.addEventListener('close', (event) => {
             console.log('WebSocket is closed now.');
         });
-        
-        // Handle errors
+
         socket.addEventListener('error', (event) => {
             console.error('WebSocket error observed:', event);
         });
@@ -324,8 +321,6 @@ const Setting = () => {
                                        </Col>
                                         <Col md={2}>
                                             <Button onClick={zAxisUpButtonClick} className='mt-4' size="lg">Z軸 往上</Button>
-                                            
-                                            
                                         </Col>
                                         <Col md={2}>
                                             <Button onClick={zAxisHomeButtonClick} className='mt-4' size="lg">Z軸 歸位</Button>
