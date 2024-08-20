@@ -9,6 +9,7 @@ import Link from 'next/link';
 const Header = () => {
     const { url, setUrl } = useUrl();
     const [inputUrl, setInputUrl] = useState<string>(url);
+    const [version, setVersion] = useState<string>('');
 
     const handleButtonClick = () => {
         setUrl(inputUrl);
@@ -20,9 +21,7 @@ const Header = () => {
         if (url) {
             axios.get(`http://${url}/api/info`)
                 .then(response => {
-                    if (response.data) {
-                        console.log('ESP32 Data:', response.data);
-                    }
+                    setVersion(response.data["version"]);
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
@@ -41,7 +40,7 @@ const Header = () => {
                     <Link className='nav-link header-link me-4' href="/Setting" passHref>設定</Link>
                 </Nav>
                 <Nav>
-                    <Navbar.Text className='mx-4 text-info'>version: v2.2.3</Navbar.Text>
+                    <Navbar.Text className='mx-4 text-info'>version: {version}</Navbar.Text>
                     <Form className="d-flex me-auto">  
                         <Form.Control
                         type="text"
