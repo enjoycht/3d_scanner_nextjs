@@ -7,9 +7,10 @@ import CsvString from './csvString';
 interface ScanControlsProps {
     angle: String;
     isPaused: boolean;
+    showPoints: boolean;
 }
 
-const ScanControls:React.FC<ScanControlsProps>= ({ angle, isPaused }) => {
+const ScanControls: React.FC<ScanControlsProps> = ({ angle, isPaused, showPoints }) => {
     const mountRef = useRef<HTMLDivElement>(null);
     const points = CsvString('/point.csv');  
 
@@ -31,6 +32,7 @@ const ScanControls:React.FC<ScanControlsProps>= ({ angle, isPaused }) => {
             console.error('No valid points found.');
             return;
         }
+
 
         // 設置場景
         const scene = new THREE.Scene();
@@ -101,8 +103,11 @@ const ScanControls:React.FC<ScanControlsProps>= ({ angle, isPaused }) => {
         pointGeometry.computeBoundingSphere(); // Ensure bounding sphere is computed correctly
         const pointMaterial = new THREE.PointsMaterial({ color: 0xff0000, size: 0.005 }); // 增加點的大小
         const pointCloud = new THREE.Points(pointGeometry, pointMaterial);
-        scene.add(pointCloud)
+        // scene.add(pointCloud)
 
+        if (showPoints) {
+            scene.add(pointCloud);
+        }
         // 添加軌道控制
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableRotate = false;
@@ -138,12 +143,15 @@ const ScanControls:React.FC<ScanControlsProps>= ({ angle, isPaused }) => {
 
         // 清理資源
         return () => {
+            if (animationFrameIdRef.current !== null) {
+                cancelAnimationFrame(animationFrameIdRef.current);
+            }
             if (mountNode) {
                 mountNode.removeChild(renderer.domElement);
             }
             window.removeEventListener('resize', handleResize);
         };
-    }, [points, angle, isPaused]);
+    }, [points, angle, isPaused, showPoints]);
     
     return (
         <div className='flex-grow-1' ref={mountRef} style={{ width:'100%', height: '100%'}} />

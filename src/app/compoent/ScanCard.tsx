@@ -15,18 +15,18 @@ interface ScanModeProps {
     rendererRef: React.MutableRefObject<THREE.WebGLRenderer | null>;
     sceneRef: React.MutableRefObject<THREE.Scene | null>;
     cameraRef: React.MutableRefObject<THREE.PerspectiveCamera | null>;
+    setShowPoints: (show: boolean) => void;
 }
 
-const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, angle, handleAngleChange, isPaused, togglePause, rendererRef, sceneRef, cameraRef }) => {
-    const url  = window.location.host;
+const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, angle, handleAngleChange, isPaused, togglePause, rendererRef, sceneRef, cameraRef, setShowPoints }) => {
+    const url = window.location.host;
     const [scanning, setScanning] = useState(false);
     const [paused, setPaused] = useState(false);
-    const [continued, setContinued] = useState(false);
-    const [end, setEnd] = useState(false);
 
     const [ws, setWs] = useState<WebSocket | null>(null);
-
+    
     const points = CsvString('/point.csv'); 
+
     const saveSvg = () => {
         if (rendererRef.current && sceneRef.current && cameraRef.current) {
             rendererRef.current.render(sceneRef.current, cameraRef.current);
@@ -80,6 +80,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
     const handleStart = () => {
         setScanning(true);
         setPaused(true);
+        setShowPoints(true); // Show points when scanning starts
     };
 
     const handlePause = () => {
@@ -93,6 +94,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
     const handleEnd = () => {
         setScanning(false);
         setPaused(false);
+        setShowPoints(false); // Hide points when scanning ends
     };
 
     return (

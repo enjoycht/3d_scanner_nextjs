@@ -1,5 +1,5 @@
 'use client';
-import React, {useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ScanCard from './compoent/ScanCard';
 import { Container, Row, Col } from 'react-bootstrap';
@@ -12,10 +12,12 @@ export default function Home() {
     const [isPointAnimation, setIsPointAnimation] = useState(true);
     const [angle, setAngle] = useState<string>('up');
     const [isPaused, setIsPaused] = useState(false);
+    const [showPoints, setShowPoints] = useState(false); // New state for points visibility
 
     const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
     const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+
     useEffect(() => {
         const socket = new WebSocket('ws://window.location.host/ws'); 
         socket.onopen = () => {
@@ -52,8 +54,6 @@ export default function Home() {
         setAngle(event.target.value);
     };
 
-    
-    // 切換模式
     const toggleFeature = () => {
         setIsPointAnimation(!isPointAnimation);
     };
@@ -76,16 +76,15 @@ export default function Home() {
                             togglePause={togglePause}
                             rendererRef={rendererRef}
                             sceneRef={sceneRef}
-                            cameraRef={cameraRef}    
+                            cameraRef={cameraRef}
+                            setShowPoints={setShowPoints} // Pass setShowPoints to ScanCard
                         />
                     </Col>
                     <Col md={9} className="d-flex">
-                        {isPointAnimation ? <ScanControls angle={angle} isPaused={isPaused}/> : <PointAnimation angle={angle} isPaused={isPaused} rendererRef={rendererRef} sceneRef={sceneRef} cameraRef={cameraRef} />}
+                        {isPointAnimation ? <ScanControls angle={angle} isPaused={isPaused} showPoints={showPoints} /> : <PointAnimation angle={angle} isPaused={isPaused} rendererRef={rendererRef} sceneRef={sceneRef} cameraRef={cameraRef} />}
                     </Col>
                 </Row>
             </Container>
         </main>
     );
 }
-
-
