@@ -4,6 +4,7 @@ import { Nav, Navbar, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useUrl } from './UrlContext';
+import Link from 'next/link';
 
 const Header = () => {
     const { url, setUrl } = useUrl();
@@ -34,10 +35,10 @@ const Header = () => {
             <Navbar.Brand href="/" className='header-link'>Home</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
-                <Nav className="mx-auto ">
-                    <Nav.Link className='header-link me-4' href="/OTA" >雲端更新</Nav.Link>
-                    <Nav.Link className='header-link me-4' href="/WIFI" >網路</Nav.Link>
-                    <Nav.Link className='header-link me-4' href="/Setting" >設定</Nav.Link>
+                <Nav className="mx-auto">                       
+                    <Link className="nav-link header-link me-4" href="/OTA" passHref>OTA</Link>
+                    <Link className='nav-link header-link me-4' href="/WIFI" passHref>網路</Link>
+                    <Link className='nav-link header-link me-4' href="/Setting" passHref>設定</Link>
                 </Nav>
                 <Nav>
                     <Navbar.Text className='mx-4 text-info'>version: v2.2.3</Navbar.Text>
