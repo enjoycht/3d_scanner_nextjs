@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import CsvString from './csvString';
@@ -17,8 +17,8 @@ const PointAnimation: React.FC<ScanAutoProps> = ({ angle, isPaused, rendererRef,
     const mountRef = useRef<HTMLDivElement>(null);
     const points = CsvString('/point.csv');  
     //旋轉角度
-    const cubeRotationRef = useRef({ y: 0 });
-    const pointCloudRotationRef = useRef({ y: 0 });
+    const cubeRotationRef = useRef({ z: 0 });
+    const pointCloudRotationRef = useRef({ z: 0 });
     //停止動畫
     const animationFrameIdRef = useRef<number | null>(null);
 
@@ -37,38 +37,45 @@ const PointAnimation: React.FC<ScanAutoProps> = ({ angle, isPaused, rendererRef,
             return;
         }
     
+        // 設置場景
         const scene = new THREE.Scene();
         sceneRef.current = scene;
     
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.00001, 1000);
         cameraRef.current = camera;
-        switch (angle) {
+        switch (angle) { 
             case 'up':
-                camera.position.set(0, 0.125, 0); // 調整相機位置
+                camera.position.set(0, 1.2, 0); // 調整相機位置
                 break;
             case 'down':
-                camera.position.set(0, -0.125, 0); // 調整相機位置
+                camera.position.set(0, -1.2, 0); 
                 break;
             case 'left':
-                camera.position.set(-0.125, 0, 0); // 調整相機位置
+                camera.position.set(-1.2, 0, 0); 
                 break;
             case 'right':
-                camera.position.set(0.125, 0, 0); // 調整相機位置
+                camera.position.set(1.2, 0, 0); 
                 break;
             case 'top-left':
-                camera.position.set(-0.125, 0.125, 0); // 調整相機位置
+                camera.position.set(-1.2, 1.2, 0); 
                 break;
             case 'bottom-left':
-                camera.position.set(-0.125, -0.125, 0); // 調整相機位置
+                camera.position.set(-1.2, -1.2, 0); 
                 break;
             case 'top-right':
-                camera.position.set(0.125, 0.125, 0); // 調整相機位置
+                camera.position.set(1.2, 1.2, 0); 
                 break;
             case 'bottom-right':
-                camera.position.set(0.125, -0.125, 0); // 調整相機位置
+                camera.position.set(1.2, -1.2, 0); 
+                break; 
+            case 'front':
+                camera.position.set(0, 0, 1.2); 
                 break;
+            case 'back':    
+                camera.position.set(0, 0, -1.2); 
+                break;  
             default:
-                camera.position.set(0.125, 0.125, 0.125); // 調整相機位置
+                camera.position.set(1.2, 1.2, 1.2); 
                 break;
         }
         
@@ -96,22 +103,23 @@ const PointAnimation: React.FC<ScanAutoProps> = ({ angle, isPaused, rendererRef,
         const pointGeometry = new THREE.BufferGeometry();
         pointGeometry.setAttribute('position', new THREE.BufferAttribute(flattenedPoints, 3));
         pointGeometry.computeBoundingSphere(); // Ensure bounding sphere is computed correctly
-        const pointMaterial = new THREE.PointsMaterial({ color: 0xff0000, size: 0.002 }); // 增加點的大小
+        const pointMaterial = new THREE.PointsMaterial({ color: 0xff0000, size: 0.005 }); // 增加點的大小
         const pointCloud = new THREE.Points(pointGeometry, pointMaterial);
-        scene.add(pointCloud);
+        scene.add(pointCloud)
     
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableRotate = false;
     
+        // 渲染場景
         const animate = () => {
             if (!isPaused) {
-                cubeRotationRef.current.y += 0.005;
-                pointCloudRotationRef.current.y += 0.005;
+                // cubeRotationRef.current.z += 0.005;
+                pointCloudRotationRef.current.z += 0.005;
             }
-            cube.rotation.y = cubeRotationRef.current.y;
-            pointCloud.rotation.y = pointCloudRotationRef.current.y;
+            // cube.rotation.y = cubeRotationRef.current.y;
+            pointCloud.rotation.z = pointCloudRotationRef.current.z;
             controls.update();
-            pointMaterial.opacity = Math.abs(Math.sin(Date.now() * 0.005));
+            // pointMaterial.opacity = Math.abs(Math.sin(Date.now() * 0.005));
             pointMaterial.transparent = true;
             renderer.render(scene, camera);
             animationFrameIdRef.current = requestAnimationFrame(animate);
@@ -144,8 +152,7 @@ const PointAnimation: React.FC<ScanAutoProps> = ({ angle, isPaused, rendererRef,
 
 
     return (
-        <div className='flex-grow-1' ref={mountRef} style={{ width:'100%', height: '100%',  }}>
-        </div>
+        <div className='flex-grow-1' ref={mountRef} style={{ width:'100%', height: '100%'}} />
     );
 }
 

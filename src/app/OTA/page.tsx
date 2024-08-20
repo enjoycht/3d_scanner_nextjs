@@ -6,9 +6,10 @@ import {unified} from 'unified'
 import React, { useEffect, useState } from 'react';
 import { VFile } from 'vfile';
 import { Container, Row, Col, Card, Form, InputGroup, Image, Button, ButtonGroup } from 'react-bootstrap';
+import { useUrl } from '../compoent/UrlContext';
 
 const OTA = () => {
-    const url = "http://localhost:8080";
+    const { url } = useUrl();
     //MakerbaseMoon  3d_scanner_esp
     const [username, setUsername] = useState("");
     const [repo, setRepo] = useState("");
@@ -34,7 +35,7 @@ const OTA = () => {
     }
 
     const flash = (type: string, id: number) => {
-        axios.get(`${url}/api/ota?type=${type}&username=${github.username}&repo=${github.repo}&id=${id}`)
+        axios.get(`http://${url}/api/ota?type=${type}&username=${github.username}&repo=${github.repo}&id=${id}`)
             .then((response) => {
                 console.log(response.data);
             })
@@ -44,7 +45,7 @@ const OTA = () => {
     }
 
     useEffect(() => {
-        axios.get(`${url}/api/info`)
+        axios.get(`http://${url}/api/info`)
             .then((response) => {
                 const github = response.data['data']['github'];
                 console.log(`GitHub: ${github}`);
@@ -53,7 +54,7 @@ const OTA = () => {
             .catch((error) => {
                 console.error(error);
             });
-    }, []);
+    }, [url]);
 
     useEffect(() => {
         if (github.username !== "" && github.repo !== "") {
@@ -85,7 +86,7 @@ const OTA = () => {
     }
 
     const espOTAUpdate = () => {
-        axios.get(`${url}/api/ota?type=esp32&username=${github.username}&repo=${github.repo}`)
+        axios.get(`http://${url}/api/ota?type=esp32&username=${github.username}&repo=${github.repo}`)
             .then((response) => {
                 console.log(response.data);
             })
