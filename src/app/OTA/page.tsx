@@ -1,6 +1,6 @@
 'use client';
 import axios from 'axios';
-import remarkHtml from 'remark-html'
+import remarkHtml from 'remark-html';
 import remarkParse from 'remark-parse'
 import {unified} from 'unified'
 import React, { useEffect, useState } from 'react';
@@ -9,6 +9,10 @@ import { Container, Row, Col, Card, Form, InputGroup, Image, Button, ButtonGroup
 
 const OTA = () => {
     const url = "http://localhost:8080";
+    //MakerbaseMoon  3d_scanner_esp
+    const [username, setUsername] = useState("");
+    const [repo, setRepo] = useState("");
+
     const [github, setGithub] = useState({
         "username": "",
         "repo": "",
@@ -76,6 +80,21 @@ const OTA = () => {
         }
     }, [github]);
 
+    const statusOTAUpdate = () => {
+        setGithub({ username, repo });
+    }
+
+    const espOTAUpdate = () => {
+        axios.get(`${url}/api/ota?type=esp32&username=${github.username}&repo=${github.repo}`)
+            .then((response) => {
+                console.log(response.data);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+        setGithub({ username, repo });
+    }
+
     return (
         <main className='d-flex'> 
             <Container className='flex-grow-1 d-flex'>
@@ -86,17 +105,29 @@ const OTA = () => {
                             <Card.Body>
                                 <Form>
                                     <Row className="mb-3">
-                                        <Col>
+                                        <Col md={3}>
                                             <InputGroup>
                                                 <InputGroup.Text id="basic-addon1">Username</InputGroup.Text>
-                                                <Form.Control placeholder={github.username} />
+                                                <Form.Control 
+                                                    placeholder={username} 
+                                                    onChange={(e) => setUsername(e.target.value)}
+                                                />
                                             </InputGroup>
                                         </Col>
-                                        <Col>
+                                        <Col md={3}>
                                             <InputGroup>
                                                 <InputGroup.Text id="basic-addon1">Repo</InputGroup.Text>
-                                                <Form.Control placeholder={github.repo} />
+                                                <Form.Control 
+                                                    placeholder={repo} 
+                                                    onChange={(e) => setRepo(e.target.value)}
+                                                />
                                             </InputGroup>
+                                        </Col>
+                                        <Col md={2} className='text-center'>
+                                            <Button onClick={statusOTAUpdate}>OTAUpdate</Button>
+                                        </Col>
+                                        <Col md={2} className='text-center'>
+                                            <Button onClick={espOTAUpdate}>ESP32 Update</Button>
                                         </Col>
                                         <Col xs={2}>
                                             <Form.Select onChange={handleReleaseChange} defaultValue={releases.length > 0 ? releases[0]["tag_name"] : "v0.0.0"} >
@@ -115,17 +146,20 @@ const OTA = () => {
                                 </Form>
                                 <Card>
                                     <Card.Header>
-                                        <Row>
+                                        <Row className='p-2'>
                                             {
                                                 (releases.length > 0) ? 
                                                     <h1>{releases[index]["name"]}</h1> :
                                                     <h1></h1>
                                             }
                                         </Row>
-                                        <Row>
-                                            <Col md="4">
+                                        <Row className='p-2'>   
+                                            <Col md="5">
+                                            {/* https://avatars.githubusercontent.com/in/15368?s=40&v=4 */}
                                                 <Image
-                                                    src={(releases.length > 0) ? `https://github.com/${releases[index]["author"]["login"]}.png` : ""}
+                                                    src={(releases.length > 0) ? 
+                                                        (releases[index]["author"]["login"] === "github-actions[bot]") ? `https://avatars.githubusercontent.com/in/15368?s=40&v=4` : 
+                                                        `https://github.com/${releases[index]["author"]["login"]}.png` : ""}
                                                     height="20"
                                                     className="d-inline-block rounded-circle"
                                                     alt={(releases.length > 0) ? releases[index]["author"]["login"] : ""}
@@ -144,17 +178,17 @@ const OTA = () => {
                                                     ""
                                                 }
                                             </Col>
-                                            <Col md="2">
+                                            <Col md="4">
                                                 {
                                                     (releases.length > 0) ? 
-                                                    releases[index]["tag_name"] :
+                                                    `版本：${releases[index]["tag_name"]} `:
                                                     ""
                                                 }
                                             </Col>
-                                            <Col md="2">
+                                            <Col md="3">
                                                 {
                                                     (releases.length > 0) ? 
-                                                    releases[index]["target_commitish"] :
+                                                   `分支：${releases[index]["target_commitish"]}` :
                                                     ""
                                                 }
                                             </Col>
@@ -171,7 +205,7 @@ const OTA = () => {
                                     </Card.Body>
                                     <Card.Footer>
                                         <Row>
-                                            <h3>Assts:</h3>
+                                            <h3>Assets:</h3>
                                         </Row>
                                         <Card>
                                             <Card.Body>
