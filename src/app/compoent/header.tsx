@@ -44,7 +44,7 @@ const Header = () => {
                     <Form className="d-flex me-auto">  
                         <Form.Control
                         type="text"
-                        placeholder="http://window.location.host"
+                        placeholder={url}
                         aria-label="ESP32 URL" 
                         className='me-2'
                         value={inputUrl}

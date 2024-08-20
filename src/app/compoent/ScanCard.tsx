@@ -1,9 +1,11 @@
 'use client';
 import React, {useEffect, useState} from 'react';
+import axios from 'axios';
 import { Card, Row, Col, FormCheck, Form, FormLabel, FormSelect, Button } from 'react-bootstrap';
 import Image from 'next/image';
 import CsvString from './csvString';
 import * as THREE from 'three';
+import { useUrl } from '../compoent/UrlContext';
 
 interface ScanModeProps {
     toggleFeature: () => void;
@@ -19,9 +21,10 @@ interface ScanModeProps {
 }
 
 const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, angle, handleAngleChange, isPaused, togglePause, rendererRef, sceneRef, cameraRef, setShowPoints }) => {
-    const url = window.location.host;
+    const { url } = useUrl();
     const [scanning, setScanning] = useState(false);
     const [paused, setPaused] = useState(false);
+    const [projectName, setProjectName] = useState('');
 
     const [ws, setWs] = useState<WebSocket | null>(null);
     
@@ -81,20 +84,48 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
         setScanning(true);
         setPaused(true);
         setShowPoints(true); // Show points when scanning starts
+        axios.get(`http://${url}/api/set/scanner?command=new&project=${projectName}`)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     };
 
     const handlePause = () => {
         setPaused(true);
+        axios.get(`http://${url}/api/set/scanner?command=stop`)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     };
 
     const handleResume = () => {
         setPaused(false);
+        axios.get(`http://${url}/api/set/scanner?command=start`)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     };
 
     const handleEnd = () => {
         setScanning(false);
         setPaused(false);
         setShowPoints(false); // Hide points when scanning ends
+        axios.get(`http://${url}/api/set/scanner?command=end`)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     };
 
     return (
@@ -140,7 +171,14 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
                             <Col>
                             {!scanning && (
                                 <div>
-                                    <Form.Control type='text' placeholder='專案名稱' className='mt-4'></Form.Control>
+                                    <Form.Control 
+                                        type='text' 
+                                        placeholder='輸入專案名稱' 
+                                        className='mt-4' 
+                                        required
+                                        value={projectName}
+                                        onChange={(e) => setProjectName(e.target.value)}
+                                    />
                                     <Button className='mt-4'  size="lg" variant="success" onClick={handleStart}>
                                         開始
                                     </Button>
