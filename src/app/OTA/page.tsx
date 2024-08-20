@@ -84,7 +84,7 @@ const OTA = () => {
 
     const espOTAUpdate = () => {
         setGithub(githubInput);
-        axios.get(`http://${url}/api/set/data?github_username=${github.username}&github_repo=${github.repo}`)
+        axios.get(`http://${url}/api/set/data?github_username=${githubInput.username}&github_repo=${githubInput.repo}`)
             .then((response) => {
                 console.log(response.data);
             })
