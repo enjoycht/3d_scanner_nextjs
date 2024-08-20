@@ -8,11 +8,6 @@ const Setting = () => {
     const { url } = useUrl();
     const [zAxisSteps, setZAxisSteps] = useState<number>(1);
 
-    const [staPlaceholder, setStaPlaceholder] = useState<string>("");
-    const [staPasswordPlaceholder, setStaPasswordPlaceholder] = useState<string>("");
-    const [apPlaceholder, setApPlaceholder] = useState<string>("");
-    const [apPasswordPlaceholder, setApPasswordPlaceholder] = useState<string>("");
-    const [esp32HostnamePlaceholder, setEsp32HostnamePlaceholder] = useState<string>("");
     const [zAxisMaxPlaceholder, setZAxisMaxPlaceholder] = useState<string>("");
     const [zAxisStepPlaceholder, setZAxisStepPlaceholder] = useState<string>("");
     const [zAxisSpeedPlaceholder, setZAxisSpeedPlaceholder] = useState<string>("");
@@ -22,11 +17,6 @@ const Setting = () => {
     const [xySpeedPlaceholder, setXySpeedPlaceholder] = useState<string>("");
     const [laserCenterPlaceholder, setLaserCenterPlaceholder] = useState<string>("");
 
-    const [staDefault, setStaDefault] = useState<string>("");
-    const [staPasswordDefault, setStaPasswordDefault] = useState<string>("");
-    const [apDefault, setApDefault] = useState<string>("");
-    const [apPasswordDefault, setApPasswordDefault] = useState<string>("");
-    const [esp32HostnameDefault, setEsp32HostnameDefault] = useState<string>("");
     const [zAxisMaxDefault, setZAxisMaxDefault] = useState<number>();
     const [zAxisStepDefault, setZAxisStepDefault] = useState<number>();
     const [zAxisSpeedDefault, setZAxisSpeedDefault] = useState<number>();
@@ -50,11 +40,6 @@ const Setting = () => {
             .then(response => {
                 if (response.data) {
                     console.log('ESP32 Data:', response.data);
-                    setStaPlaceholder(response.data['data']['sta']['ssid']);
-                    setStaPasswordPlaceholder(response.data['data']['sta']['password']);
-                    setApPlaceholder(response.data['data']['ap']['ssid']);
-                    setApPasswordPlaceholder(response.data['data']['ap']['password']);
-                    setEsp32HostnamePlaceholder(response.data['data']['mdns']);
                     setZAxisMaxPlaceholder(response.data['data']['module']['z_axis_max']);
                     setZAxisStepPlaceholder(response.data['data']['module']['z_axis_one_time_step']);
                     setZAxisSpeedPlaceholder(response.data['data']['module']['z_axis_delay_time']);
@@ -77,10 +62,8 @@ const Setting = () => {
         // Listen for messages
         socket.addEventListener('message', (event: MessageEvent) => {
             const message = JSON.parse(event.data);
-            console.log('Message from server: ', message.z_steps);
             setZAxisCorrentPosition(message.z_steps);
             setLaserDistance(message.vl53l1x);
-            // setLaserDistance(message.);
         });
         
         // Connection closed
@@ -102,9 +85,18 @@ const Setting = () => {
 
     const saveButtonClick = () => {
         console.log('Save Setting');
-        // /api/set/data?sta_ssid=<sta_ssid>&sta_password=<sta_password>&ap_ssid=<ap_ssid>&ap_password=<ap_password>&mdns=<mdns>&github_username=<github_username>&github_repo=<github_repo>&z_axis_max=<z_axis_max>&z_axis_start_step=<z_axis_start_step>&z_axis_delay_time=<z_axis_delay_time>&z_axis_one_time_step=<z_axis_one_time_step>&x_y_axis_max=<x_y_axis_max>&x_y_axis_step_delay_time=<x_y_axis_step_delay_time>&x_y_axis_one_time_step=<x_y_axis_one_time_step>&vl53l1x_center=<vl53l1x_center>&vl53l1x_timeing_budget=<vl53l1x_timeing_budget>
-        console.log('save url: ', `http://${url}/api/set/data?z_axis_max=${zAxisMaxDefault=== undefined ? zAxisMaxPlaceholder : zAxisMaxDefault}&z_axis_start_step=${zAxisStepDefault === undefined ? zAxisStepPlaceholder : zAxisStepDefault}&z_axis_delay_time=${zAxisSpeedDefault === undefined ? zAxisSpeedPlaceholder : zAxisSpeedDefault}&z_axis_one_time_step=${zAxisCorrectionDefault === undefined ? zAxisCorrectionPlaceholder : zAxisCorrectionDefault}&x_y_axis_max=${xyStepDefault === undefined ? xyStepPlaceholder : xyStepDefault}&x_y_axis_step_delay_time=${xyStepPerStepDefault === undefined ? xyStepPerStepPlaceholder: xyStepPerStepDefault}&x_y_axis_one_time_step=${xySpeedDefault === undefined ? xySpeedPlaceholder : xySpeedDefault}&vl53l1x_center=${laserCenterDefault === undefined ? laserCenterPlaceholder : laserCenterDefault}&vl53l1x_timeing_budget=${timingBudgetDefault}`);
-        axios.get(`http://${url}/api/set/data?z_axis_max=${zAxisMaxDefault=== undefined ? zAxisMaxPlaceholder : zAxisMaxDefault}&z_axis_start_step=${zAxisStepDefault === undefined ? zAxisStepPlaceholder : zAxisStepDefault}&z_axis_delay_time=${zAxisSpeedDefault === undefined ? zAxisSpeedPlaceholder : zAxisSpeedDefault}&z_axis_one_time_step=${zAxisCorrectionDefault === undefined ? zAxisCorrectionPlaceholder : zAxisCorrectionDefault}&x_y_axis_max=${xyStepDefault === undefined ? xyStepPlaceholder : xyStepDefault}&x_y_axis_step_delay_time=${xyStepPerStepDefault === undefined ? xyStepPerStepPlaceholder: xyStepPerStepDefault}&x_y_axis_one_time_step=${xySpeedDefault === undefined ? xySpeedPlaceholder : xySpeedDefault}&vl53l1x_center=${laserCenterDefault === undefined ? laserCenterPlaceholder : laserCenterDefault}&vl53l1x_timeing_budget=${timingBudgetDefault}`)
+        const zAxisMax = zAxisMaxDefault === undefined ? zAxisMaxPlaceholder : zAxisMaxDefault;
+        const zAxisStep = zAxisStepDefault === undefined ? zAxisStepPlaceholder : zAxisStepDefault;
+        const zAxisSpeed = zAxisSpeedDefault === undefined ? zAxisSpeedPlaceholder : zAxisSpeedDefault;
+        const zAxisCorrection = zAxisCorrectionDefault === undefined ? zAxisCorrectionPlaceholder : zAxisCorrectionDefault;
+        const xyStep = xyStepDefault === undefined ? xyStepPlaceholder : xyStepDefault;
+        const xyStepPerStep = xyStepPerStepDefault === undefined ? xyStepPerStepPlaceholder: xyStepPerStepDefault;
+        const xySpeed = xySpeedDefault === undefined ? xySpeedPlaceholder : xySpeedDefault;
+        const laserCenter = laserCenterDefault === undefined ? laserCenterPlaceholder : laserCenterDefault;
+        const timingBudget = timingBudgetDefault;
+
+        console.log('save url: ', `http://${url}/api/set/data?z_axis_max=${zAxisMax}&z_axis_start_step=${zAxisStep}&z_axis_delay_time=${zAxisSpeed}&z_axis_one_time_step=${zAxisCorrection}&x_y_axis_max=${xyStep}&x_y_axis_step_delay_time=${xyStepPerStep}&x_y_axis_one_time_step=${xySpeed}&vl53l1x_center=${laserCenter}&vl53l1x_timeing_budget=${timingBudget}`);
+        axios.get(`http://${url}/api/set/data?z_axis_max=${zAxisMax}&z_axis_start_step=${zAxisStep}&z_axis_delay_time=${zAxisSpeed}&z_axis_one_time_step=${zAxisCorrection}&x_y_axis_max=${xyStep}&x_y_axis_step_delay_time=${xyStepPerStep}&x_y_axis_one_time_step=${xySpeed}&vl53l1x_center=${laserCenter}&vl53l1x_timeing_budget=${timingBudget}`)
             .then(response => {
                 if (response.data) {
                     console.log('ESP32 Data:', response.data);
