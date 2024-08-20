@@ -10,14 +10,9 @@ import { useUrl } from '../compoent/UrlContext';
 
 const OTA = () => {
     const { url } = useUrl();
-    //MakerbaseMoon  3d_scanner_esp
-    const [username, setUsername] = useState("");
-    const [repo, setRepo] = useState("");
 
-    const [github, setGithub] = useState({
-        "username": "",
-        "repo": "",
-    });
+    const [github, setGithub] = useState({ "username": "", "repo": "", });
+    const [githubInput, setGithubInput] = useState({ "username": "", "repo": "", });
 
     const [releases, setReleases] = useState([]);
     const [index, setIndex] = useState(0);
@@ -45,6 +40,7 @@ const OTA = () => {
     }
 
     useEffect(() => {
+        if (url !== "" && url !== undefined) {
         axios.get(`http://${url}/api/info`)
             .then((response) => {
                 const github = response.data['data']['github'];
@@ -54,6 +50,7 @@ const OTA = () => {
             .catch((error) => {
                 console.error(error);
             });
+        }
     }, [url]);
 
     useEffect(() => {
@@ -82,18 +79,18 @@ const OTA = () => {
     }, [github]);
 
     const statusOTAUpdate = () => {
-        setGithub({ username, repo });
+        setGithub(githubInput);
     }
 
     const espOTAUpdate = () => {
-        axios.get(`http://${url}/api/ota?type=esp32&username=${github.username}&repo=${github.repo}`)
+        setGithub(githubInput);
+        axios.get(`http://${url}/api/set/data?github_username=${github.username}&github_repo=${github.repo}`)
             .then((response) => {
                 console.log(response.data);
             })
             .catch((error) => {
                 console.error(error);
             });
-        setGithub({ username, repo });
     }
 
     return (
@@ -110,8 +107,8 @@ const OTA = () => {
                                             <InputGroup>
                                                 <InputGroup.Text id="basic-addon1">Username</InputGroup.Text>
                                                 <Form.Control 
-                                                    placeholder={username} 
-                                                    onChange={(e) => setUsername(e.target.value)}
+                                                    placeholder={github.username} 
+                                                    onChange={(e) => setGithubInput({"username": e.target.value, "repo": github.repo})}
                                                 />
                                             </InputGroup>
                                         </Col>
@@ -119,16 +116,16 @@ const OTA = () => {
                                             <InputGroup>
                                                 <InputGroup.Text id="basic-addon1">Repo</InputGroup.Text>
                                                 <Form.Control 
-                                                    placeholder={repo} 
-                                                    onChange={(e) => setRepo(e.target.value)}
+                                                    placeholder={github.repo} 
+                                                    onChange={(e) => setGithubInput({"username": github.username, "repo": e.target.value})}
                                                 />
                                             </InputGroup>
                                         </Col>
                                         <Col md={2} className='text-center'>
-                                            <Button onClick={statusOTAUpdate}>OTAUpdate</Button>
+                                            <Button onClick={statusOTAUpdate}>即時更新</Button>
                                         </Col>
                                         <Col md={2} className='text-center'>
-                                            <Button onClick={espOTAUpdate}>ESP32 Update</Button>
+                                            <Button onClick={espOTAUpdate}>即時更新並上傳</Button>
                                         </Col>
                                         <Col xs={2}>
                                             <Form.Select onChange={handleReleaseChange} defaultValue={releases.length > 0 ? releases[0]["tag_name"] : "v0.0.0"} >
