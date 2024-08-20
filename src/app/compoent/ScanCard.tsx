@@ -84,7 +84,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
         setScanning(true);
         setPaused(true);
         setShowPoints(true); // Show points when scanning starts
-        axios.get(`http://${url}/api/set/scanner?command=new&project=${projectName}`)
+        axios.get(`http://${url}/api/set/scanner?command=new&name=${projectName}`)
             .then((response) => {
                 console.log(response);
             })
