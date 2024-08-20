@@ -53,7 +53,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
     };
 
     useEffect(() => {
-        const socket = new WebSocket(`ws://${url}`);
+        const socket = new WebSocket(`ws://${url}/ws`);
         socket.addEventListener('open', (event) => {
             console.log('WebSocket is open now.');
         });
@@ -113,6 +113,23 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
                                 onChange={toggleFeature}
                             />
                         </Form>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <FormLabel className='fw-bold fs-3 mt-4'>選擇角度</FormLabel>
+                        <FormSelect value={angle} onChange={handleAngleChange}>
+                            <option value="up">上</option>
+                            <option value="down">下</option>
+                            <option value="left">左</option>
+                            <option value="right">右</option>
+                            <option value="top-left">左上</option>
+                            <option value="bottom-left">左下</option>
+                            <option value="top-right">右上</option>
+                            <option value="bottom-right">右下</option>
+                            <option value="front">前</option>
+                            <option value="back">後</option>
+                        </FormSelect>
                     </Col>
                 </Row>
                 {isPointAnimation ? (
@@ -177,21 +194,6 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
                                 <Button onClick={saveCsv}>
                                     下載CSV
                                 </Button>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <FormLabel className='fw-bold fs-3 mt-4'>選擇角度</FormLabel>
-                                <FormSelect value={angle} onChange={handleAngleChange}>
-                                    <option value="up">上</option>
-                                    <option value="down">下</option>
-                                    <option value="left">左</option>
-                                    <option value="right">右</option>
-                                    <option value="top-left">左上</option>
-                                    <option value="bottom-left">左下</option>
-                                    <option value="top-right">右上</option>
-                                    <option value="bottom-right">右下</option>
-                                </FormSelect>
                             </Col>
                         </Row>
                     </>

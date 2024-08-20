@@ -12,11 +12,11 @@ const CsvString = (url: string) => {
                 Papa.parse(csvString, {
                     header: false,
                     complete: (results: ParseResult<string[]>) => {
-                        const parsedData = results.data.map((row: string[]) => row.map(value => parseFloat(value) * 1000));
+                        const parsedData = results.data.map((row: string[]) => row.map(value => parseFloat(value) * 0.01));
                         setData(parsedData);
                     }
                 });
-            });
+        });
     }, [url]);
 
     return data;

@@ -10,7 +10,7 @@ import * as THREE from 'three';
 
 export default function Home() {
     const [isPointAnimation, setIsPointAnimation] = useState(true);
-    const [angle, setAngle] = useState<string>('left');
+    const [angle, setAngle] = useState<string>('up');
     const [isPaused, setIsPaused] = useState(false);
 
     const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -80,7 +80,7 @@ export default function Home() {
                         />
                     </Col>
                     <Col md={9} className="d-flex">
-                        {isPointAnimation ? <ScanControls angle={angle} /> : <PointAnimation angle={angle} isPaused={isPaused} rendererRef={rendererRef} sceneRef={sceneRef} cameraRef={cameraRef} />}
+                        {isPointAnimation ? <ScanControls angle={angle} isPaused={isPaused}/> : <PointAnimation angle={angle} isPaused={isPaused} rendererRef={rendererRef} sceneRef={sceneRef} cameraRef={cameraRef} />}
                     </Col>
                 </Row>
             </Container>

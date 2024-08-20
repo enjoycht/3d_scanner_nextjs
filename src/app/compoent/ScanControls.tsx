@@ -6,14 +6,24 @@ import CsvString from './csvString';
 
 interface ScanControlsProps {
     angle: String;
+    isPaused: boolean;
 }
 
-const ScanControls:React.FC<ScanControlsProps>= ({ angle }) => {
+const ScanControls:React.FC<ScanControlsProps>= ({ angle, isPaused }) => {
     const mountRef = useRef<HTMLDivElement>(null);
     const points = CsvString('/point.csv');  
 
+    //旋轉角度
+    const cubeRotationRef = useRef({ z: 0 });
+    const pointCloudRotationRef = useRef({ z: 0 });
+    //停止動畫
+    const animationFrameIdRef = useRef<number | null>(null);
+
     useEffect(() => {
-        if (!points || points.length === 0) return;
+        if (!points || points.length === 0) {
+            console.error('No points loaded.');
+            return;
+        }
 
         const flattenedPoints = new Float32Array(points.flat().filter(value => !isNaN(value)));
 
@@ -29,31 +39,37 @@ const ScanControls:React.FC<ScanControlsProps>= ({ angle }) => {
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         switch (angle) {
             case 'up':
-                camera.position.set(0, 5, 0);
+                camera.position.set(0, 1.2, 0); // 調整相機位置
                 break;
             case 'down':
-                camera.position.set(0, -5, 0);
+                camera.position.set(0, -1.2, 0); 
                 break;
             case 'left':
-                camera.position.set(-5, 0, 0);
+                camera.position.set(-1.2, 0, 0); 
                 break;
             case 'right':
-                camera.position.set(5, 0, 0);
+                camera.position.set(1.2, 0, 0); 
                 break;
             case 'top-left':
-                camera.position.set(-5, 5, 0);
+                camera.position.set(-1.2, 1.2, 0); 
                 break;
             case 'bottom-left':
-                camera.position.set(-5, -5, 0);
+                camera.position.set(-1.2, -1.2, 0); 
                 break;
             case 'top-right':
-                camera.position.set(5, 5, 0);
+                camera.position.set(1.2, 1.2, 0); 
                 break;
             case 'bottom-right':
-                camera.position.set(5, -5, 0);
+                camera.position.set(1.2, -1.2, 0); 
+                break; 
+            case 'front':
+                camera.position.set(0, 0, 1.2); 
                 break;
+            case 'back':    
+                camera.position.set(0, 0, -1.2); 
+                break;  
             default:
-                camera.position.set(5, 5, 5);
+                camera.position.set(1.2, 1.2, 1.2); 
                 break;
         }
 
@@ -77,28 +93,33 @@ const ScanControls:React.FC<ScanControlsProps>= ({ angle }) => {
             new THREE.MeshBasicMaterial({ color: 0x00ffff })  // 青色
         ];
         const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
+        // scene.add(cube);
 
         // 創建點雲
         const pointGeometry = new THREE.BufferGeometry();
         pointGeometry.setAttribute('position', new THREE.BufferAttribute(flattenedPoints, 3));
         pointGeometry.computeBoundingSphere(); // Ensure bounding sphere is computed correctly
-        const pointMaterial = new THREE.PointsMaterial({ color: 0xff0000, size: 0.1 });
+        const pointMaterial = new THREE.PointsMaterial({ color: 0xff0000, size: 0.005 }); // 增加點的大小
         const pointCloud = new THREE.Points(pointGeometry, pointMaterial);
-        scene.add(pointCloud);
+        scene.add(pointCloud)
 
         // 添加軌道控制
         const controls = new OrbitControls(camera, renderer.domElement);
-    
+        controls.enableRotate = false;
+
         // 渲染場景
         const animate = () => {
-            requestAnimationFrame(animate);
+            if (!isPaused) {
+                // cubeRotationRef.current.z += 0.005;
+                pointCloudRotationRef.current.z += 0.002;
+            }
+            // cube.rotation.z = cubeRotationRef.current.z;
+            pointCloud.rotation.z = pointCloudRotationRef.current.z;
             controls.update();
-            
-            pointMaterial.opacity = Math.abs(Math.sin(Date.now() * 0.005));
+            // pointMaterial.opacity = Math.abs(Math.sin(Date.now() * 0.005));
             pointMaterial.transparent = true;
-
             renderer.render(scene, camera);
+            animationFrameIdRef.current = requestAnimationFrame(animate);
         };
 
         animate();
@@ -122,10 +143,10 @@ const ScanControls:React.FC<ScanControlsProps>= ({ angle }) => {
             }
             window.removeEventListener('resize', handleResize);
         };
-    }, [points, angle]);
+    }, [points, angle, isPaused]);
     
     return (
-        <div className='flex-grow-1' ref={mountRef} style={{ width:'100%', height: '100%', overflow: 'hidden' }} />
+        <div className='flex-grow-1' ref={mountRef} style={{ width:'100%', height: '100%'}} />
     )
 }
 
