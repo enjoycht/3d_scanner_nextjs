@@ -1,9 +1,11 @@
 'use client';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import axios from 'axios';
 import { Card, Row, Col, FormCheck, Form, FormLabel, FormSelect, Button } from 'react-bootstrap';
 import Image from 'next/image';
 import CsvString from './csvString';
 import * as THREE from 'three';
+import { useUrl } from '../compoent/UrlContext';
 
 interface ScanModeProps {
     toggleFeature: () => void;
@@ -15,10 +17,19 @@ interface ScanModeProps {
     rendererRef: React.MutableRefObject<THREE.WebGLRenderer | null>;
     sceneRef: React.MutableRefObject<THREE.Scene | null>;
     cameraRef: React.MutableRefObject<THREE.PerspectiveCamera | null>;
+    setShowPoints: (show: boolean) => void;
 }
 
-const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, angle, handleAngleChange, isPaused, togglePause, rendererRef, sceneRef, cameraRef }) => {
-    const points = CsvString('/point.csv');  
+const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, angle, handleAngleChange, isPaused, togglePause, rendererRef, sceneRef, cameraRef, setShowPoints }) => {
+    const { url } = useUrl();
+    const [scanning, setScanning] = useState(false);
+    const [paused, setPaused] = useState(false);
+    const [projectName, setProjectName] = useState('');
+
+    const [ws, setWs] = useState<WebSocket | null>(null);
+    
+    const points = CsvString('/point.csv'); 
+
     const saveSvg = () => {
         if (rendererRef.current && sceneRef.current && cameraRef.current) {
             rendererRef.current.render(sceneRef.current, cameraRef.current);
@@ -44,6 +55,79 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
         }
     };
 
+    useEffect(() => {
+        const socket = new WebSocket(`ws://${url}/ws`);
+        socket.addEventListener('open', (event) => {
+            console.log('WebSocket is open now.');
+        });
+        
+        // Listen for messages
+        socket.addEventListener('message', (event) => {
+            const message = JSON.parse(event.data);
+            console.log('Message from server ', message);
+        });
+        
+        // Connection closed
+        socket.addEventListener('close', (event) => {
+            console.log('WebSocket is closed now.');
+        });
+        
+        // Handle errors
+        socket.addEventListener('error', (event) => {
+            console.error('WebSocket error observed:', event);
+        });
+        
+        setWs(socket);
+    }, [url]);
+
+    const handleStart = () => {
+        setScanning(true);
+        setPaused(true);
+        setShowPoints(true); // Show points when scanning starts
+        axios.get(`http://${url}/api/set/scanner?command=new&project=${projectName}`)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+
+    const handlePause = () => {
+        setPaused(true);
+        axios.get(`http://${url}/api/set/scanner?command=stop`)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+
+    const handleResume = () => {
+        setPaused(false);
+        axios.get(`http://${url}/api/set/scanner?command=start`)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+
+    const handleEnd = () => {
+        setScanning(false);
+        setPaused(false);
+        setShowPoints(false); // Hide points when scanning ends
+        axios.get(`http://${url}/api/set/scanner?command=end`)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+
     return (
         <Card bg="light" className='text-center d-flex flex-grow-1 my-5 mx-4'>
             <Card.Header className='fs-2 fw-bold'>3D立體成型掃描機</Card.Header>
@@ -54,7 +138,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
                 <Row>
                     <Col>
                         <Form>
-                            <FormLabel className='fs-3 mt-4 fw-bold'>{isPointAnimation ? '自動模式' : '手動模式'}</FormLabel>
+                            <FormLabel className='fs-3 mt-4 fw-bold'>{isPointAnimation ? '掃描模式' : '自動模式'}</FormLabel>
                             <FormCheck 
                                 type='switch' 
                                 id='mode-switch'
@@ -64,7 +148,71 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
                         </Form>
                     </Col>
                 </Row>
+                <Row>
+                    <Col>
+                        <FormLabel className='fw-bold fs-3 mt-4'>選擇角度</FormLabel>
+                        <FormSelect value={angle} onChange={handleAngleChange}>
+                            <option value="up">上</option>
+                            <option value="down">下</option>
+                            <option value="left">左</option>
+                            <option value="right">右</option>
+                            <option value="top-left">左上</option>
+                            <option value="bottom-left">左下</option>
+                            <option value="top-right">右上</option>
+                            <option value="bottom-right">右下</option>
+                            <option value="front">前</option>
+                            <option value="back">後</option>
+                        </FormSelect>
+                    </Col>
+                </Row>
                 {isPointAnimation ? (
+                    <>
+                        <Row>
+                            <Col>
+                            {!scanning && (
+                                <div>
+                                    <Form.Control 
+                                        type='text' 
+                                        placeholder='輸入專案名稱' 
+                                        className='mt-4' 
+                                        required
+                                        value={projectName}
+                                        onChange={(e) => setProjectName(e.target.value)}
+                                    />
+                                    <Button className='mt-4'  size="lg" variant="success" onClick={handleStart}>
+                                        開始
+                                    </Button>
+                                </div>
+                            )}
+                            </Col>
+                        </Row>
+                        {scanning && (
+                            <>
+                                <Row>
+                                    <Col>
+                                    {!paused ? (
+                                        <Button className='mt-4' size="lg" variant="info" onClick={handlePause}>
+                                            暫停
+                                        </Button>
+                                    ) : (
+                                        <Button className='mt-4' size="lg" onClick={handleResume} >
+                                            繼續
+                                        </Button>
+                                    )}
+                                    </Col>
+                                </Row>     
+                                                
+                                <Row>
+                                    <Col>
+                                        <Button className='mt-4' size="lg" variant="danger" onClick={handleEnd}>
+                                            結束
+                                        </Button>
+                                    </Col>
+                                </Row>
+                            </>
+                        )}
+                    </>
+                ) : (
                     <>
                         <Row>
                             <Col>
@@ -86,39 +234,6 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
                                 <Button onClick={saveCsv}>
                                     下載CSV
                                 </Button>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <FormLabel className='fw-bold fs-3 mt-4'>選擇角度</FormLabel>
-                                <FormSelect value={angle} onChange={handleAngleChange}>
-                                    <option value="up">上</option>
-                                    <option value="down">下</option>
-                                    <option value="left">左</option>
-                                    <option value="right">右</option>
-                                    <option value="top-left">左上</option>
-                                    <option value="bottom-left">左下</option>
-                                    <option value="top-right">右上</option>
-                                    <option value="bottom-right">右下</option>
-                                </FormSelect>
-                            </Col>
-                        </Row>
-                    </>
-                ) : (
-                    <>
-                        <Row>
-                            <Col>
-                                <FormLabel>選擇角度</FormLabel>
-                                <FormSelect value={angle} onChange={handleAngleChange}>
-                                    <option value="up">上</option>
-                                    <option value="down">下</option>
-                                    <option value="left">左</option>
-                                    <option value="right">右</option>
-                                    <option value="top-left">左上</option>
-                                    <option value="bottom-left">左下</option>
-                                    <option value="top-right">右上</option>
-                                    <option value="bottom-right">右下</option>
-                                </FormSelect>
                             </Col>
                         </Row>
                     </>

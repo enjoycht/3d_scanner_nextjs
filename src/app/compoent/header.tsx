@@ -3,25 +3,31 @@ import React, {useState, useEffect} from 'react';
 import { Nav, Navbar, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useUrl } from './UrlContext';
 
 const Header = () => {
-    const [inputUrl, setInputUrl] = useState<string>('http://window.location.host');
+    const { url, setUrl } = useUrl();
+    const [inputUrl, setInputUrl] = useState<string>(url);
 
     const handleButtonClick = () => {
-        console.log('Input URL:', inputUrl);
+        setUrl(inputUrl);
+        console.log('URL updated to:', inputUrl);
     };
 
     useEffect(() => {
-        axios.get(`${inputUrl}/api/info`)
-            .then(response => {
-                if (response.data) {
-                    console.log('ESP32 Data:', response.data);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    }, [inputUrl]);
+        console.log('Current URL:', url);
+        if (url) {
+            axios.get(`http://${url}/api/info`)
+                .then(response => {
+                    if (response.data) {
+                        console.log('ESP32 Data:', response.data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+    }, [url]);
 
     return (
         <Navbar expand="lg" className="header px-5 py-2">
@@ -38,7 +44,7 @@ const Header = () => {
                     <Form className="d-flex me-auto">  
                         <Form.Control
                         type="text"
-                        placeholder="http://window.location.host"
+                        placeholder={url}
                         aria-label="ESP32 URL" 
                         className='me-2'
                         value={inputUrl}
