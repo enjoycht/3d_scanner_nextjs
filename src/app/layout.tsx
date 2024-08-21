@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { UrlProvider } from "./compoent/UrlContext";
 import { InfoProvider } from './compoent/info';
+import { MsgProvider } from './compoent/websocket';
 import Header from "./compoent/header";
 import './global.css';
 
@@ -17,12 +18,14 @@ export default function RootLayout({
     return (
         <UrlProvider>
             <InfoProvider>
-                <html lang="en">
-                    <body>
-                        <Header />
-                        {children}
-                    </body>
-                </html>
+                <MsgProvider>
+                    <html lang="en">
+                        <body>
+                            <Header />
+                            {children}
+                        </body>
+                    </html>
+                </MsgProvider>
             </InfoProvider>
         </UrlProvider>
     );

@@ -4,17 +4,12 @@ import axios from 'axios';
 import { Container, Row, Col, Card, Form, Button, InputGroup } from 'react-bootstrap';
 import { useUrl } from '../compoent/UrlContext';
 import { useInfo } from '../compoent/info';
+import { useMsg } from '../compoent/websocket';
 
 const Setting = () => {
     const { url } = useUrl();
     const { info } = useInfo();
-
-    const [ws, setWs] = useState<WebSocket | null>(null);
-
-    const [message, setMessage] = useState({
-        z_axis: 0,
-        vl53l1x: 0
-    });
+    const { stopMsg } = useMsg();
 
     const [zAxisSteps, setZAxisSteps] = useState(0);
     const [moduleData, setModuleData] = useState({
@@ -47,33 +42,6 @@ const Setting = () => {
         setModuleDataP(info['module']);
         setModuleChange('vl53l1x_timeing_budget', info['module']['vl53l1x_timeing_budget']);
     }, [info]);
-
-    useEffect(() => {
-        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
-        const socket = new WebSocket(`ws://${url}/ws`);
-
-        socket.addEventListener('open', (event) => {
-            console.log('WebSocket is open now.');
-        });
-        
-        socket.addEventListener('message', (event: MessageEvent) => {
-            setMessage(JSON.parse(event.data));
-        });
-
-        socket.addEventListener('close', (event) => {
-            console.log('WebSocket is closed now.');
-        });
-
-        socket.addEventListener('error', (event) => {
-            console.error('WebSocket error observed:', event);
-        });
-        
-        setWs(socket);
-        
-        return () => {
-            socket.close();
-        };
-    }, [url]);
 
     const saveButtonClick = () => {
         let param = "";
@@ -338,7 +306,7 @@ const Setting = () => {
                                                     required
                                                     disabled
                                                     type="text"
-                                                    value={message.z_axis}
+                                                    value={stopMsg.z_steps}
                                                     onChange={(e) => (isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
                                                 />
                                                 <InputGroup.Text> / 47000</InputGroup.Text>
@@ -351,7 +319,7 @@ const Setting = () => {
                                                     required
                                                     disabled
                                                     type="text"
-                                                    value={message.vl53l1x}
+                                                    value={stopMsg.vl53l1x}
                                                     onChange={(e) => (isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
                                                 />
                                                 <InputGroup.Text>mm</InputGroup.Text>
