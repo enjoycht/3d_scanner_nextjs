@@ -9,6 +9,10 @@ interface MsgContextType {
     setScanMsg: (newMsg: any) => void;
     points: number[][];
     setPoints: (newPoints: number[][]) => void;
+    status: string;
+    setStatus: (newStatus: string) => void;
+    name: string;
+    setName: (newName: string) => void;
 }
 
 // Create the context
@@ -16,6 +20,8 @@ export const MsgContext = createContext<MsgContextType | undefined>(undefined);
 
 export const MsgProvider = ({ children }: { children: ReactNode }) => {
     const { url, setUrl } = useUrl();
+    const [status, setStatus] = useState<string>("");
+    const [name, setName] = useState<string>("");
 
     const [stopMsg, setStopMsg] = useState({
         z_steps: 0,
@@ -49,8 +55,21 @@ export const MsgProvider = ({ children }: { children: ReactNode }) => {
         };
 
         ws.onmessage = (event) => {
+            console.log('WebSocket message:', event.data);
             const msg = JSON.parse(event.data);
             console.log('WebSocket message:', msg);
+            if (msg["status"] === "scan") {
+                setStatus("scan");
+            } else if (msg["status"] === "stop") {
+                if (msg["name"] !== "") {
+                    setStatus("stop");
+                } else {
+                    setStatus("end");
+                }
+            }
+            if (msg["name"] !== undefined) {
+                setName(msg["name"]);
+            }
             if (msg["name"] !== undefined && msg["points_count"] !== undefined && msg["is_last"] !== undefined && msg["points"] !== undefined) {
                 setScanMsg(msg);
                 setPoints(prevPoints => [...prevPoints, ...msg.points.map((point: number[]) => point.map((value: number) => value * 0.01))]);
@@ -71,7 +90,7 @@ export const MsgProvider = ({ children }: { children: ReactNode }) => {
     }, [points]);
 
     return (
-        <MsgContext.Provider value={{ stopMsg, setStopMsg, scanMsg, setScanMsg, points, setPoints }}>
+        <MsgContext.Provider value={{ stopMsg, setStopMsg, scanMsg, setScanMsg, points, setPoints, status, setStatus, name, setName }}>
             {children}
         </MsgContext.Provider>
     );

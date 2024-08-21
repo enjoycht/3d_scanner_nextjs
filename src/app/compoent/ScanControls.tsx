@@ -7,10 +7,9 @@ import { useMsg } from '../compoent/websocket';
 interface ScanControlsProps {
     angle: String;
     isPaused: boolean;
-    showPoints: boolean;
 }
 
-const ScanControls: React.FC<ScanControlsProps> = ({ angle, isPaused, showPoints }) => {
+const ScanControls: React.FC<ScanControlsProps> = ({ angle, isPaused }) => {
     const { points } = useMsg();
     const mountRef = useRef<HTMLDivElement>(null);
     
@@ -89,11 +88,8 @@ const ScanControls: React.FC<ScanControlsProps> = ({ angle, isPaused, showPoints
         const pointCloud = new THREE.Points(pointGeometry, pointMaterial);
         // scene.add(pointCloud)
 
-        if (showPoints) {
-            scene.add(pointCloud);
-        } else {
-            scene.remove(pointCloud);
-        }
+        scene.add(pointCloud);
+
         // 添加軌道控制
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableRotate = false;
@@ -136,7 +132,7 @@ const ScanControls: React.FC<ScanControlsProps> = ({ angle, isPaused, showPoints
                 cancelAnimationFrame(animationFrameIdRef.current);
             }
         };
-    }, [points, angle, isPaused, showPoints]);
+    }, [points, angle, isPaused]);
 
     return (
         <div className='flex-grow-1' ref={mountRef} style={{ width:'100%', height: '100%'}} />

@@ -2,7 +2,6 @@
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import { Card, Row, Col, FormCheck, Form, FormLabel, FormSelect, Button } from 'react-bootstrap';
-import Image from 'next/image';
 import * as THREE from 'three';
 import { useUrl } from '../compoent/UrlContext';
 import { useMsg } from '../compoent/websocket';
@@ -17,14 +16,11 @@ interface ScanModeProps {
     rendererRef: React.MutableRefObject<THREE.WebGLRenderer | null>;
     sceneRef: React.MutableRefObject<THREE.Scene | null>;
     cameraRef: React.MutableRefObject<THREE.PerspectiveCamera | null>;
-    setShowPoints: (show: boolean) => void;
 }
 
-const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, angle, handleAngleChange, isPaused, togglePause, rendererRef, sceneRef, cameraRef, setShowPoints }) => {
+const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, angle, handleAngleChange, isPaused, togglePause, rendererRef, sceneRef, cameraRef }) => {
     const { url } = useUrl();
-    const { points } = useMsg();
-    const [scanning, setScanning] = useState(false);
-    const [paused, setPaused] = useState(false);
+    const { points, status, name, setPoints } = useMsg();
     const [projectName, setProjectName] = useState('');
     
     const saveSvg = () => {
@@ -53,9 +49,8 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
     };
 
     const handleStart = () => {
-        setScanning(true);
-        setPaused(false);
-        setShowPoints(true); // Show points when scanning starts
+        if(projectName === "" || projectName === undefined) {return;};
+        setPoints([])
         if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         axios.get(`http://${url}/api/set/scanner?command=new&name=${projectName}`)
             .then((response) => {
@@ -68,7 +63,6 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
 
     const handlePause = () => {
         if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
-        setPaused(true);
         axios.get(`http://${url}/api/set/scanner?command=stop`)
             .then((response) => {
                 console.log(response);
@@ -80,7 +74,6 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
 
     const handleResume = () => {
         if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
-        setPaused(false);
         axios.get(`http://${url}/api/set/scanner?command=start`)
             .then((response) => {
                 console.log(response);
@@ -92,9 +85,6 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
 
     const handleEnd = () => {
         if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
-        setScanning(false);
-        setPaused(false);
-        setShowPoints(false); // Hide points when scanning ends
         axios.get(`http://${url}/api/set/scanner?command=end`)
             .then((response) => {
                 console.log(response);
@@ -108,9 +98,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
         <Card bg="light" className='text-center d-flex flex-grow-1 my-5 mx-4'>
             <Card.Header className='fs-2 fw-bold'>3D立體成型掃描機</Card.Header>
             <Card.Body>
-                <div>
-                    <Image src='https://via.placeholder.com/150' alt='placeholder' width={150} height={150} />
-                </div>
+                <FormLabel className='fs-3 mt-4 fw-bold'>{name}</FormLabel>
                 <Row>
                     <Col>
                         <Form>
@@ -152,7 +140,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
                     <>
                         <Row>
                             <Col>
-                            {!scanning && (
+                            {status === "end" && (
                                 <div>
                                     <Form.Control 
                                         type='text' 
@@ -169,11 +157,11 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
                             )}
                             </Col>
                         </Row>
-                        {scanning && (
+                        {(status === "scan" || status === "stop" ) && (
                             <>
                                 <Row>
                                     <Col>
-                                    {!paused ? (
+                                    { (status === "scan" ) ? (
                                         <Button className='mt-4' size="lg" variant="info" onClick={handlePause}>
                                             暫停
                                         </Button>

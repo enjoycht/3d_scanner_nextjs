@@ -10,9 +10,8 @@ import * as THREE from 'three';
 
 export default function Home() {
     const [isPointAnimation, setIsPointAnimation] = useState(true);
-    const [angle, setAngle] = useState<string>('up');
+    const [angle, setAngle] = useState<string>('front');
     const [isPaused, setIsPaused] = useState(false);
-    const [showPoints, setShowPoints] = useState(false); // New state for points visibility
 
     const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
@@ -45,11 +44,10 @@ export default function Home() {
                             rendererRef={rendererRef}
                             sceneRef={sceneRef}
                             cameraRef={cameraRef}
-                            setShowPoints={setShowPoints}
                         />
                     </Col>
                     <Col md={9} className="d-flex">
-                        {isPointAnimation ? <ScanControls angle={angle} isPaused={isPaused} showPoints={showPoints} /> : <PointAnimation angle={angle} isPaused={isPaused} rendererRef={rendererRef} sceneRef={sceneRef} cameraRef={cameraRef} />}
+                        {isPointAnimation ? <ScanControls angle={angle} isPaused={isPaused} /> : <PointAnimation angle={angle} isPaused={isPaused} rendererRef={rendererRef} sceneRef={sceneRef} cameraRef={cameraRef} />}
                     </Col>
                 </Row>
             </Container>
