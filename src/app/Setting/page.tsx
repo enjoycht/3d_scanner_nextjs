@@ -3,9 +3,12 @@ import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import { Container, Row, Col, Card, Form, Button, InputGroup } from 'react-bootstrap';
 import { useUrl } from '../compoent/UrlContext';
+import { useInfo } from '../compoent/info';
 
 const Setting = () => {
     const { url } = useUrl();
+    const { info } = useInfo();
+
     const [ws, setWs] = useState<WebSocket | null>(null);
 
     const [message, setMessage] = useState({
@@ -41,19 +44,13 @@ const Setting = () => {
     });
 
     useEffect(() => {
-        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
+        setModuleDataP(info['module']);
+        setModuleChange('vl53l1x_timeing_budget', info['module']['vl53l1x_timeing_budget']);
+    }, [info]);
+
+    useEffect(() => {
+        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         const socket = new WebSocket(`ws://${url}/ws`);
-        axios.get(`http://${url}/api/info`)
-            .then(response => {
-                if (response.data) {
-                    console.log('ESP32 Data:', response.data);
-                    setModuleDataP(response.data['data']['module']);
-                    setModuleChange('vl53l1x_timeing_budget', response.data['data']['module']['vl53l1x_timeing_budget']);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
 
         socket.addEventListener('open', (event) => {
             console.log('WebSocket is open now.');

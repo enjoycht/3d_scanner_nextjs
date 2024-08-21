@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { UrlProvider } from "./compoent/UrlContext";
+import { InfoProvider } from './compoent/info';
 import Header from "./compoent/header";
 import './global.css';
 
@@ -15,12 +16,14 @@ export default function RootLayout({
     }>) {
     return (
         <UrlProvider>
-            <html lang="en">
-                <body>
-                    <Header />
-                    {children}
-                </body>
-            </html>
+            <InfoProvider>
+                <html lang="en">
+                    <body>
+                        <Header />
+                        {children}
+                    </body>
+                </html>
+            </InfoProvider>
         </UrlProvider>
     );
 }
