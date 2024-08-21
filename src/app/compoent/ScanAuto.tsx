@@ -19,7 +19,7 @@ const PointAnimation: React.FC<ScanAutoProps> = ({ angle, isPaused, rendererRef,
     const mountRef = useRef<HTMLDivElement>(null);
     // const points = CsvString('/point.csv');  
 
-    const points = CsvString(`ws://${url}/ws`)
+    const points = CsvString(url)
     //旋轉角度
     const cubeRotationRef = useRef({ z: 0 });
     const pointCloudRotationRef = useRef({ z: 0 });
