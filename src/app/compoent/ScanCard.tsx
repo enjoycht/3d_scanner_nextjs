@@ -56,7 +56,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
     };
 
     useEffect(() => {
-        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
+        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
         const socket = new WebSocket(`ws://${url}/ws`);
         socket.addEventListener('open', (event) => {
             console.log('WebSocket is open now.');

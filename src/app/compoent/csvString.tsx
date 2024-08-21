@@ -6,7 +6,7 @@ const CsvString = (url: string) => {
     const [data, setData] = useState<number[][]>([]);
 
     useEffect(() => {
-        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
+        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
         const ws = new WebSocket(`ws://${url}/ws`);
 
         ws.onmessage = (event) => {

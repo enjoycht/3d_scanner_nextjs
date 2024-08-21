@@ -30,6 +30,7 @@ const OTA = () => {
     }
 
     const flash = (type: string, id: number) => {
+        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
         axios.get(`http://${url}/api/ota?type=${type}&username=${github.username}&repo=${github.repo}&id=${id}`)
             .then((response) => {
                 console.log(response.data);
@@ -40,7 +41,7 @@ const OTA = () => {
     }
 
     useEffect(() => {
-        if (url !== "" && url !== undefined) {
+        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
         axios.get(`http://${url}/api/info`)
             .then((response) => {
                 const github = response.data['data']['github'];
@@ -50,7 +51,6 @@ const OTA = () => {
             .catch((error) => {
                 console.error(error);
             });
-        }
     }, [url]);
 
     useEffect(() => {
@@ -84,6 +84,7 @@ const OTA = () => {
 
     const espOTAUpdate = () => {
         setGithub(githubInput);
+        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
         axios.get(`http://${url}/api/set/data?github_username=${githubInput.username}&github_repo=${githubInput.repo}`)
             .then((response) => {
                 console.log(response.data);
