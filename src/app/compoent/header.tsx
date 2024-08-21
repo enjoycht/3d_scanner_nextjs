@@ -46,6 +46,9 @@ const Header = () => {
                     </Form>
                     <Button variant="outline-success" onClick={handleButtonClick}>確定</Button>
                 </Nav>
+                <Nav>
+                    <Button variant='outline-danger' onClick={() => axios.get(`http://${url}/api/restart`)}>重啟</Button>
+                </Nav>
             </Navbar.Collapse>
         </Navbar>
     );
