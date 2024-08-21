@@ -32,6 +32,8 @@ const Header = () => {
                     {
                         (info["version"] === "v0.0.0") ?
                             <Navbar.Text className='mx-4 text-warning'>version: v0.0.0 測試版本</Navbar.Text> :
+                        (info["version"] === "") ?
+                            "" :
                             <Navbar.Text className='mx-4 text-info'>version: {info["version"]}</Navbar.Text>
                     }
                     <Form className="d-flex me-auto">  
@@ -39,7 +41,6 @@ const Header = () => {
                         type="text"
                         placeholder={url}
                         aria-label="ESP32 URL" 
-                        className='me-2'
                         value={inputUrl}
                         onChange={(e) => setInputUrl(e.target.value)}
                         />
@@ -47,7 +48,7 @@ const Header = () => {
                     <Button variant="outline-success" onClick={handleButtonClick}>確定</Button>
                 </Nav>
                 <Nav>
-                    <Button variant='outline-danger' onClick={() => axios.get(`http://${url}/api/restart`)}>重啟</Button>
+                    <Button variant='outline-danger' className='ms-4' onClick={() => axios.get(`http://${url}/api/restart`)}>重啟</Button>
                 </Nav>
             </Navbar.Collapse>
         </Navbar>
