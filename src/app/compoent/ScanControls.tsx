@@ -2,8 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
-import CsvString from './csvString';
-import { useUrl } from '../compoent/UrlContext';
+import { useMsg } from '../compoent/websocket';
 
 interface ScanControlsProps {
     angle: String;
@@ -12,11 +11,8 @@ interface ScanControlsProps {
 }
 
 const ScanControls: React.FC<ScanControlsProps> = ({ angle, isPaused, showPoints }) => {
-    const { url } = useUrl();
+    const { points } = useMsg();
     const mountRef = useRef<HTMLDivElement>(null);
-    // const points = CsvString('/point.csv');  
-
-    const points = CsvString(url)
     
     //旋轉角度
     const cubeRotationRef = useRef({ z: 0 });

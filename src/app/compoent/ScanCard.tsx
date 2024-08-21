@@ -3,9 +3,9 @@ import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import { Card, Row, Col, FormCheck, Form, FormLabel, FormSelect, Button } from 'react-bootstrap';
 import Image from 'next/image';
-import CsvString from './csvString';
 import * as THREE from 'three';
 import { useUrl } from '../compoent/UrlContext';
+import { useMsg } from '../compoent/websocket';
 
 interface ScanModeProps {
     toggleFeature: () => void;
@@ -22,14 +22,11 @@ interface ScanModeProps {
 
 const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, angle, handleAngleChange, isPaused, togglePause, rendererRef, sceneRef, cameraRef, setShowPoints }) => {
     const { url } = useUrl();
+    const { points } = useMsg();
     const [scanning, setScanning] = useState(false);
     const [paused, setPaused] = useState(false);
     const [projectName, setProjectName] = useState('');
-
-    const [ws, setWs] = useState<WebSocket | null>(null);
     
-    const points = CsvString(url)
-
     const saveSvg = () => {
         if (rendererRef.current && sceneRef.current && cameraRef.current) {
             rendererRef.current.render(sceneRef.current, cameraRef.current);
@@ -54,29 +51,6 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
             document.body.removeChild(link);
         }
     };
-
-    useEffect(() => {
-        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
-        const socket = new WebSocket(`ws://${url}/ws`);
-        socket.addEventListener('open', (event) => {
-            console.log('WebSocket is open now.');
-        });
-
-        socket.addEventListener('message', (event) => {
-            const message = JSON.parse(event.data);
-            console.log('Message from server ', message);
-        });
-        
-        socket.addEventListener('close', (event) => {
-            console.log('WebSocket is closed now.');
-        });
-        
-        socket.addEventListener('error', (event) => {
-            console.error('WebSocket error observed:', event);
-        });
-        
-        setWs(socket);
-    }, [url]);
 
     const handleStart = () => {
         setScanning(true);

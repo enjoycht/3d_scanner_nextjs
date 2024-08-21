@@ -5,8 +5,10 @@ import { useUrl } from './UrlContext';
 interface MsgContextType {
     stopMsg: { z_steps: number; vl53l1x: number; };
     setStopMsg: (newMsg: any) => void;
-    scanMsg: any;
+    scanMsg: { name: string; points_count: number; is_last: boolean; points: number[][] };
     setScanMsg: (newMsg: any) => void;
+    points: number[][];
+    setPoints: (newPoints: number[][]) => void;
 }
 
 // Create the context
@@ -25,6 +27,8 @@ export const MsgProvider = ({ children }: { children: ReactNode }) => {
         is_last: false,
         points: []
     });
+
+    const [points, setPoints] =useState<number[][]>([]);
 
     const [ws, setWs] = useState<WebSocket | null>(null);
 
@@ -46,8 +50,10 @@ export const MsgProvider = ({ children }: { children: ReactNode }) => {
 
         ws.onmessage = (event) => {
             const msg = JSON.parse(event.data);
+            // console.log('WebSocket message:', msg);
             if (msg["name"] !== undefined && msg["points_count"] !== undefined && msg["is_last"] !== undefined && msg["points"] !== undefined) {
                 setScanMsg(msg);
+                setPoints(prevPoints => [...prevPoints, ...msg.points.map((point: number[]) => point.map((value: number) => value * 0.1))]);
             } 
 
             if (msg["z_steps"] !== undefined && msg["vl53l1x"] !== undefined) {
@@ -60,8 +66,12 @@ export const MsgProvider = ({ children }: { children: ReactNode }) => {
         };
     }, [url]);
 
+    useEffect(() => {
+        console.log('Points state updated:', points);
+    }, [points]);
+
     return (
-        <MsgContext.Provider value={{ stopMsg, setStopMsg, scanMsg, setScanMsg }}>
+        <MsgContext.Provider value={{ stopMsg, setStopMsg, scanMsg, setScanMsg, points, setPoints }}>
             {children}
         </MsgContext.Provider>
     );
