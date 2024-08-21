@@ -15,27 +15,6 @@ const WiFi = () => {
     const [apPasswordDefault, setApPasswordDefault] = useState<string>("");
     const [esp32HostnameDefault, setEsp32HostnameDefault] = useState<string>("");
 
-<<<<<<< HEAD
-    useEffect(() => {
-        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
-        axios.get(`http://${url}/api/info`)
-            .then(response => {
-                if (response.data) {
-                    console.log('ESP32 Data:', response.data);
-                    setStaPlaceholder(response.data['data']['sta']['ssid']);
-                    setStaPasswordPlaceholder(response.data['data']['sta']['password']);
-                    setApPlaceholder(response.data['data']['ap']['ssid']);
-                    setApPasswordPlaceholder(response.data['data']['ap']['password']);
-                    setEsp32HostnamePlaceholder(response.data['data']['mdns']);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    }, [url]);
-
-=======
->>>>>>> bea507b (♻️ refactor: Refactor ESP32 Info API)
     const saveButtonClick = () => {
         const staSSID = staDefault === '' ? info["sta"]["ssid"] : staDefault;
         const staPassword = staPasswordDefault === '' ? info["sta"]["password"]  : staPasswordDefault;
