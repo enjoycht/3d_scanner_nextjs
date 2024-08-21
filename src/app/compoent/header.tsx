@@ -29,7 +29,9 @@ const Header = () => {
 
     return (
         <Navbar expand="lg" className="header px-5 py-2">
-            <Navbar.Brand href="/" className='header-link'>Home</Navbar.Brand>
+            <Navbar.Brand className='header-link me-4'>
+                <Link className="nav-link header-link" href="/" passHref>Home</Link>
+            </Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mx-auto">                       
