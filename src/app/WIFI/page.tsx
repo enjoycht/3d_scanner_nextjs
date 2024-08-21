@@ -3,15 +3,11 @@ import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import { Container, Row, Col, Card, Form, Button} from 'react-bootstrap';
 import { useUrl } from '../compoent/UrlContext';
+import { useInfo } from '../compoent/info';
 
 const WiFi = () => {
     const { url } = useUrl();
-
-    const [staPlaceholder, setStaPlaceholder] = useState<string>("");
-    const [staPasswordPlaceholder, setStaPasswordPlaceholder] = useState<string>("");
-    const [apPlaceholder, setApPlaceholder] = useState<string>("");
-    const [apPasswordPlaceholder, setApPasswordPlaceholder] = useState<string>("");
-    const [esp32HostnamePlaceholder, setEsp32HostnamePlaceholder] = useState<string>("");
+    const { info } = useInfo();
 
     const [staDefault, setStaDefault] = useState<string>("");
     const [staPasswordDefault, setStaPasswordDefault] = useState<string>("");
@@ -19,36 +15,14 @@ const WiFi = () => {
     const [apPasswordDefault, setApPasswordDefault] = useState<string>("");
     const [esp32HostnameDefault, setEsp32HostnameDefault] = useState<string>("");
 
-    useEffect(() => {
-        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
-        axios.get(`http://${url}/api/info`)
-            .then(response => {
-                if (response.data) {
-                    console.log('ESP32 Data:', response.data);
-                    setStaPlaceholder(response.data['data']['sta']['ssid']);
-                    setStaPasswordPlaceholder(response.data['data']['sta']['password']);
-                    setApPlaceholder(response.data['data']['ap']['ssid']);
-                    setApPasswordPlaceholder(response.data['data']['ap']['password']);
-                    setEsp32HostnamePlaceholder(response.data['data']['mdns']);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    }, [url]);
-
     const saveButtonClick = () => {
-        const staSSID = staDefault === '' ? staPlaceholder : staDefault;
-        const staPassword = staPasswordDefault === '' ? staPasswordPlaceholder : staPasswordDefault;
-        const apSSID = apDefault === '' ? apPlaceholder : apDefault;
-        const apPassword = apPasswordDefault === '' ? apPasswordPlaceholder : apPasswordDefault;
-        const mdns = esp32HostnameDefault === '' ? esp32HostnamePlaceholder : esp32HostnameDefault;
-
-        console.log('Save Setting');
-        console.log(staSSID, staPassword, apSSID, apPassword, mdns);
-        console.log('wifi url: ', `http://${url}/api/set/data?sta_ssid=${staSSID}&sta_password=${staPassword}&ap_ssid=${apSSID}&ap_password=${apPassword}&mdns=${mdns}`);
+        const staSSID = staDefault === '' ? info["sta"]["ssid"] : staDefault;
+        const staPassword = staPasswordDefault === '' ? info["sta"]["password"]  : staPasswordDefault;
+        const apSSID = apDefault === '' ? info["ap"]["ssid"]  : apDefault;
+        const apPassword = apPasswordDefault === '' ? info["ap"]["password"]  : apPasswordDefault;
+        const mdns = esp32HostnameDefault === '' ? info["mdns"] : esp32HostnameDefault;
         
-        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
+        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
         axios.get(`http://${url}/api/set/data?sta_ssid=${staSSID}&sta_password=${staPassword}&ap_ssid=${apSSID}&ap_password=${apPassword}&mdns=${mdns}`)
             .then(response => {
                 if (response.data) {
@@ -76,7 +50,7 @@ const WiFi = () => {
                                             <Form.Control
                                                 required
                                                 type="text"
-                                                placeholder={staPlaceholder}
+                                                placeholder={info["sta"]["ssid"]}
                                                 defaultValue={staDefault}
                                                 onChange={(e) => setStaDefault(e.target.value)}
                                             />
@@ -86,7 +60,7 @@ const WiFi = () => {
                                             <Form.Control
                                                 required
                                                 type="text"
-                                                placeholder={staPasswordPlaceholder}
+                                                placeholder={info["sta"]["password"]}
                                                 defaultValue={staPasswordDefault}
                                                 onChange={(e) => setStaPasswordDefault(e.target.value)}
                                             />
@@ -98,7 +72,7 @@ const WiFi = () => {
                                             <Form.Control
                                                 required
                                                 type="text"
-                                                placeholder={apPlaceholder}
+                                                placeholder={info["ap"]["ssid"]}
                                                 defaultValue={apDefault}
                                                 onChange={(e) => setApDefault(e.target.value)}
                                             />
@@ -108,7 +82,7 @@ const WiFi = () => {
                                             <Form.Control
                                                 required
                                                 type="text"
-                                                placeholder={apPasswordPlaceholder}
+                                                placeholder={info["ap"]["password"]}
                                                 defaultValue={apPasswordDefault}
                                                 onChange={(e) => setApPasswordDefault(e.target.value)}
                                             />
@@ -121,7 +95,7 @@ const WiFi = () => {
                                             <Form.Control
                                             required
                                             type="text"
-                                            placeholder={esp32HostnamePlaceholder}
+                                            placeholder={info["mdns"]}
                                             defaultValue={esp32HostnameDefault}
                                             onChange={(e) => setEsp32HostnameDefault(e.target.value)}
                                             />

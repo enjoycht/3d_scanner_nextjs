@@ -4,28 +4,17 @@ import { Nav, Navbar, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useUrl } from './UrlContext';
+import { useInfo } from './info';
 import Link from 'next/link';
 
 const Header = () => {
     const { url, setUrl } = useUrl();
+    const { info } = useInfo();
     const [inputUrl, setInputUrl] = useState<string>(url);
-    const [version, setVersion] = useState<string>('');
 
     const handleButtonClick = () => {
         setUrl(inputUrl);
     };
-
-    useEffect(() => {
-        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
-        axios.get(`http://${url}/api/info`)
-            .then(response => {
-                setVersion(response.data["data"]["version"]);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-
-    }, [url]);
 
     return (
         <Navbar expand="lg" className="header px-5 py-2">
@@ -41,9 +30,9 @@ const Header = () => {
                 </Nav>
                 <Nav>
                     {
-                        (version === "v0.0.0") ?
+                        (info["version"] === "v0.0.0") ?
                             <Navbar.Text className='mx-4 text-warning'>version: v0.0.0 測試版本</Navbar.Text> :
-                            <Navbar.Text className='mx-4 text-info'>version: {version}</Navbar.Text>
+                            <Navbar.Text className='mx-4 text-info'>version: {info["version"]}</Navbar.Text>
                     }
                     <Form className="d-flex me-auto">  
                         <Form.Control

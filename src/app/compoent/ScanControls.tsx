@@ -2,8 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
-import CsvString from './csvString';
-import { useUrl } from '../compoent/UrlContext';
+import { useMsg } from '../compoent/websocket';
 
 interface ScanControlsProps {
     angle: String;
@@ -11,12 +10,10 @@ interface ScanControlsProps {
     showPoints: boolean;
 }
 
-const ScanControls: React.FC<ScanControlsProps> = ({ angle, isPaused, showPoints}) => {
-    const { url } = useUrl();
+const ScanControls: React.FC<ScanControlsProps> = ({ angle, isPaused, showPoints }) => {
+    const { points } = useMsg();
     const mountRef = useRef<HTMLDivElement>(null);
-    // const points = CsvString('/point.csv');  
-    const points = CsvString(url)
-
+    
     //旋轉角度
     const pointCloudRotationRef = useRef({ z: 0 });
     //停止動畫
@@ -45,31 +42,31 @@ const ScanControls: React.FC<ScanControlsProps> = ({ angle, isPaused, showPoints
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 1000);
         switch (angle) {
             case 'up':
-                camera.position.set(0, 0.3, 0); // 調整相機位置
+                camera.position.set(0, 0.9, 0); // 調整相機位置
                 break;
             case 'down':
-                camera.position.set(0, -0.3, 0);
+                camera.position.set(0, -0.9, 0);
                 break;
             case 'left':
-                camera.position.set(-0.3, 0, 0);
+                camera.position.set(-0.9, 0, 0);
                 break;
             case 'right':
-                camera.position.set(0.3, 0, 0);
+                camera.position.set(0.9, 0, 0);
                 break;
             case 'top-left':
-                camera.position.set(-0.3, 0.3, 0);
+                camera.position.set(-0.9, 0.9, 0);
                 break;
             case 'bottom-left':
-                camera.position.set(-0.3, -0.3, 0);
+                camera.position.set(-0.9, -0.9, 0);
                 break;
             case 'top-right':
-                camera.position.set(0.3, 0.3, 0);
+                camera.position.set(0.9, 0.9, 0);
                 break;
             case 'bottom-right':
-                camera.position.set(0.3, -0.3, 0);
+                camera.position.set(0.9, -0.9, 0);
                 break;
             case 'front':
-                camera.position.set(0, 0, 0.3);
+                camera.position.set(0, 0, 0.9);
                 break;
             case 'back':
                 camera.position.set(0, 0, -0.3);

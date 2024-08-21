@@ -7,9 +7,11 @@ import React, { useEffect, useState } from 'react';
 import { VFile } from 'vfile';
 import { Container, Row, Col, Card, Form, InputGroup, Image, Button, ButtonGroup } from 'react-bootstrap';
 import { useUrl } from '../compoent/UrlContext';
+import { useInfo } from '../compoent/info';
 
 const OTA = () => {
     const { url } = useUrl();
+    const { info } = useInfo()
 
     const [github, setGithub] = useState({ "username": "", "repo": "", });
     const [githubInput, setGithubInput] = useState({ "username": "", "repo": "", });
@@ -30,6 +32,7 @@ const OTA = () => {
     }
 
     const flash = (type: string, id: number) => {
+        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
         axios.get(`http://${url}/api/ota?type=${type}&username=${github.username}&repo=${github.repo}&id=${id}`)
             .then((response) => {
                 console.log(response.data);
@@ -40,18 +43,8 @@ const OTA = () => {
     }
 
     useEffect(() => {
-        if (url !== "" && url !== undefined) {
-        axios.get(`http://${url}/api/info`)
-            .then((response) => {
-                const github = response.data['data']['github'];
-                console.log(`GitHub: ${github}`);
-                setGithub(github);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-        }
-    }, [url]);
+        setGithub(info['github']);
+    }, [info]);
 
     useEffect(() => {
         if (github.username !== "" && github.repo !== "") {
@@ -84,6 +77,7 @@ const OTA = () => {
 
     const espOTAUpdate = () => {
         setGithub(githubInput);
+        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
         axios.get(`http://${url}/api/set/data?github_username=${githubInput.username}&github_repo=${githubInput.repo}`)
             .then((response) => {
                 console.log(response.data);

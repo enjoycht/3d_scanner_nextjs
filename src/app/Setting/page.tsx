@@ -3,15 +3,13 @@ import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import { Container, Row, Col, Card, Form, Button, InputGroup } from 'react-bootstrap';
 import { useUrl } from '../compoent/UrlContext';
+import { useInfo } from '../compoent/info';
+import { useMsg } from '../compoent/websocket';
 
 const Setting = () => {
     const { url } = useUrl();
-    const [ws, setWs] = useState<WebSocket | null>(null);
-
-    const [message, setMessage] = useState({
-        z_steps: 0,
-        vl53l1x: 0
-    });
+    const { info } = useInfo();
+    const { stopMsg } = useMsg();
 
     const [zAxisSteps, setZAxisSteps] = useState(1);
     const [moduleData, setModuleData] = useState({
@@ -41,42 +39,9 @@ const Setting = () => {
     });
 
     useEffect(() => {
-        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
-        const socket = new WebSocket(`ws://${url}/ws`);
-        axios.get(`http://${url}/api/info`)
-            .then(response => {
-                if (response.data) {
-                    console.log('ESP32 Data:', response.data);
-                    setModuleDataP(response.data['data']['module']);
-                    setModuleChange('vl53l1x_timeing_budget', response.data['data']['module']['vl53l1x_timeing_budget']);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-
-        socket.addEventListener('open', (event) => {
-            console.log('WebSocket is open now.');
-        });
-        
-        socket.addEventListener('message', (event: MessageEvent) => {
-            setMessage(JSON.parse(event.data));
-        });
-
-        socket.addEventListener('close', (event) => {
-            console.log('WebSocket is closed now.');
-        });
-
-        socket.addEventListener('error', (event) => {
-            console.error('WebSocket error observed:', event);
-        });
-        
-        setWs(socket);
-        
-        return () => {
-            socket.close();
-        };
-    }, [url]);
+        setModuleDataP(info['module']);
+        setModuleChange('vl53l1x_timeing_budget', info['module']['vl53l1x_timeing_budget']);
+    }, [info]);
 
     const saveButtonClick = () => {
         let param = "";
@@ -89,7 +54,7 @@ const Setting = () => {
         }
         param = param.slice(0, -1);
         console.log(`Save Setting: ${param}`);
-        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
+        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
         axios.get(`http://${url}/api/set/data?${param}`)
             .then(response => {
                 if (response.data) {
@@ -103,8 +68,8 @@ const Setting = () => {
  
     const zAxisUpButtonClick = () => {
         console.log(`Z Axis Up: ${zAxisSteps}steps`);
-        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
-        axios.get(`http://${url}/api/set/scanner?command=up&step=${zAxisSteps<=0?1:zAxisSteps}`)
+        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
+        axios.get(`http://${url}/api/set/scanner?command=up&step=${zAxisSteps}`)
             .then(response => {
                 if (response.data) {
                     console.log('ESP32 Data:', response.data);
@@ -117,7 +82,7 @@ const Setting = () => {
 
     const zAxisDownButtonClick = () => {
         console.log(`Z Axis Down: ${zAxisSteps}steps`);
-        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
+        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
         axios.get(`http://${url}/api/set/scanner?command=down&step=${zAxisSteps<=0?1:zAxisSteps}`)
             .then(response => {
                 if (response.data) {
@@ -131,7 +96,7 @@ const Setting = () => {
 
     const zAxisHomeButtonClick = () => {
         console.log('Z Axis Home');
-        if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
+        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
         axios.get(`http://${url}/api/set/scanner?command=home`)
             .then(response => {
                 if (response.data) {
@@ -341,7 +306,8 @@ const Setting = () => {
                                                     required
                                                     disabled
                                                     type="text"
-                                                    value={message.z_steps}
+                                                    value={stopMsg.z_steps}
+                                                    onChange={(e) => (isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
                                                 />
                                                 <InputGroup.Text> / 47000</InputGroup.Text>
                                             </InputGroup>
@@ -353,7 +319,8 @@ const Setting = () => {
                                                     required
                                                     disabled
                                                     type="text"
-                                                    value={message.vl53l1x}
+                                                    value={stopMsg.vl53l1x}
+                                                    onChange={(e) => (isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
                                                 />
                                                 <InputGroup.Text>mm</InputGroup.Text>
                                             </InputGroup>
