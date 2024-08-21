@@ -25,7 +25,6 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
     const [scanning, setScanning] = useState(false);
     const [paused, setPaused] = useState(false);
     const [projectName, setProjectName] = useState('');
-
     const [ws, setWs] = useState<WebSocket | null>(null);
     
     const points = CsvString(url)
@@ -80,7 +79,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
 
     const handleStart = () => {
         setScanning(true);
-        setPaused(true);
+        setPaused(false);
         setShowPoints(true); // Show points when scanning starts
         if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
         axios.get(`http://${url}/api/set/scanner?command=new&name=${projectName}`)
@@ -167,6 +166,13 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
                         </FormSelect>
                     </Col>
                 </Row>
+                <Row>
+                    <Col>
+                        <Button onClick={togglePause}  size="lg" className='mt-4'>
+                            {isPaused ? '旋轉' : '停止旋轉'}
+                        </Button>
+                    </Col>
+                </Row>
                 {isPointAnimation ? (
                     <>
                         <Row>
@@ -216,13 +222,6 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
                     </>
                 ) : (
                     <>
-                        <Row>
-                            <Col>
-                                <Button onClick={togglePause} className='mt-4'>
-                                    {isPaused ? '播放' : '暫停'}
-                                </Button>
-                            </Col>
-                        </Row>
                         <Row>
                             <Col><p className='fs-3 fw-bold mt-4'>下載</p></Col>
                         </Row>

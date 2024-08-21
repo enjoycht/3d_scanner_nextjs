@@ -9,11 +9,11 @@ const Setting = () => {
     const [ws, setWs] = useState<WebSocket | null>(null);
 
     const [message, setMessage] = useState({
-        z_axis: 0,
+        z_steps: 0,
         vl53l1x: 0
     });
 
-    const [zAxisSteps, setZAxisSteps] = useState(0);
+    const [zAxisSteps, setZAxisSteps] = useState(1);
     const [moduleData, setModuleData] = useState({
         z_axis_max: "",
         z_axis_one_time_step: "",
@@ -104,7 +104,7 @@ const Setting = () => {
     const zAxisUpButtonClick = () => {
         console.log(`Z Axis Up: ${zAxisSteps}steps`);
         if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
-        axios.get(`http://${url}/api/set/scanner?command=up&step=${zAxisSteps}`)
+        axios.get(`http://${url}/api/set/scanner?command=up&step=${zAxisSteps<=0?1:zAxisSteps}`)
             .then(response => {
                 if (response.data) {
                     console.log('ESP32 Data:', response.data);
@@ -118,7 +118,7 @@ const Setting = () => {
     const zAxisDownButtonClick = () => {
         console.log(`Z Axis Down: ${zAxisSteps}steps`);
         if(!url || url === "" || url === undefined || url.includes("github.io")) {return;};
-        axios.get(`http://${url}/api/set/scanner?command=down&step=${zAxisSteps}`)
+        axios.get(`http://${url}/api/set/scanner?command=down&step=${zAxisSteps<=0?1:zAxisSteps}`)
             .then(response => {
                 if (response.data) {
                     console.log('ESP32 Data:', response.data);
@@ -341,8 +341,7 @@ const Setting = () => {
                                                     required
                                                     disabled
                                                     type="text"
-                                                    value={message.z_axis}
-                                                    onChange={(e) => (isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
+                                                    value={message.z_steps}
                                                 />
                                                 <InputGroup.Text> / 47000</InputGroup.Text>
                                             </InputGroup>
@@ -355,7 +354,6 @@ const Setting = () => {
                                                     disabled
                                                     type="text"
                                                     value={message.vl53l1x}
-                                                    onChange={(e) => (isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
                                                 />
                                                 <InputGroup.Text>mm</InputGroup.Text>
                                             </InputGroup>

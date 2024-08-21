@@ -21,7 +21,6 @@ const PointAnimation: React.FC<ScanAutoProps> = ({ angle, isPaused, rendererRef,
 
     const points = CsvString(url)
     //旋轉角度
-    const cubeRotationRef = useRef({ z: 0 });
     const pointCloudRotationRef = useRef({ z: 0 });
     //停止動畫
     const animationFrameIdRef = useRef<number | null>(null);
@@ -91,19 +90,6 @@ const PointAnimation: React.FC<ScanAutoProps> = ({ angle, isPaused, rendererRef,
             mountNode.appendChild(renderer.domElement);
         }
     
-        const geometry = new THREE.BoxGeometry();
-        const material = [
-            new THREE.MeshBasicMaterial({ color: new THREE.Color(0.678, 0.847, 0.902) }), // 紅色
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 }), // 綠色
-            new THREE.MeshBasicMaterial({ color: 0x00ff00 }), // 綠色
-            new THREE.MeshBasicMaterial({ color: 0x0000ff }), // 藍色
-            new THREE.MeshBasicMaterial({ color: 0xffff00 }), // 黃色
-            new THREE.MeshBasicMaterial({ color: 0xff00ff }), // 洋红色
-            new THREE.MeshBasicMaterial({ color: 0x00ffff })  // 青色
-        ];
-        const cube = new THREE.Mesh(geometry, material);
-        // scene.add(cube);
-    
         const pointGeometry = new THREE.BufferGeometry();
         pointGeometry.setAttribute('position', new THREE.BufferAttribute(flattenedPoints, 3));
         pointGeometry.computeBoundingSphere(); // Ensure bounding sphere is computed correctly
@@ -117,12 +103,11 @@ const PointAnimation: React.FC<ScanAutoProps> = ({ angle, isPaused, rendererRef,
         // 渲染場景
         const animate = () => {
             if (!isPaused) {
-                // cubeRotationRef.current.z += 0.005;
                 pointCloudRotationRef.current.z += 0.005;
             }
-            // cube.rotation.y = cubeRotationRef.current.y;
             pointCloud.rotation.z = pointCloudRotationRef.current.z;
             controls.update();
+            // blink point
             // pointMaterial.opacity = Math.abs(Math.sin(Date.now() * 0.005));
             pointMaterial.transparent = true;
             renderer.render(scene, camera);
