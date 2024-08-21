@@ -25,10 +25,7 @@ const PointAnimation: React.FC<ScanAutoProps> = ({ angle, isPaused, rendererRef,
     useEffect(() => {
         console.log('Points:', points); // 添加這行來檢查 points 的值
     
-        if (!points || points.length === 0) {
-            console.error('No points loaded.');
-            return;
-        }
+        if (!points || points.length === 0) { return; }
     
         const flattenedPoints = new Float32Array(points.flat().filter(value => !isNaN(value)));
     

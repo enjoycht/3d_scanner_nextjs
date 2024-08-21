@@ -20,10 +20,7 @@ const ScanControls: React.FC<ScanControlsProps> = ({ angle, isPaused, showPoints
     const animationFrameIdRef = useRef<number | null>(null);
 
     useEffect(() => {
-        if (!points || points.length === 0) {
-            console.error('No points loaded.');
-            return;
-        }
+        if (!points || points.length === 0) { return; }
 
         console.log('Points:', points); 
         
