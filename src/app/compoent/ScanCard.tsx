@@ -29,7 +29,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
             const dataUrl = rendererRef.current.domElement.toDataURL('image/png');
             const link = document.createElement('a');
             link.href = dataUrl;
-            link.download = 'scene.png';
+            link.download = '${projectName}.png';
             link.click();
         }
     };
@@ -41,7 +41,7 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             link.href = url;
-            link.setAttribute('download', 'points.csv');
+            link.setAttribute('download', '${projectName}.csv');
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -96,20 +96,19 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
 
     return (
         <Card bg="light" className='text-center d-flex flex-grow-1 my-5 mx-4'>
-            <Card.Header className='fs-2 fw-bold'>3D立體成型掃描機</Card.Header>
+            <Card.Header className='fs-2 fw-bold'>3D立體成形掃描機</Card.Header>
             <Card.Body>
                 <FormLabel className='fs-3 mt-4 fw-bold'>{name}</FormLabel>
                 <Row>
                     <Col>
-                        <Form>
-                            <FormLabel className='fs-3 mt-4 fw-bold'>{isPointAnimation ? '掃描模式' : '自動模式'}</FormLabel>
-                            <FormCheck 
-                                type='switch' 
-                                id='mode-switch'
-                                checked={!isPointAnimation}
-                                onChange={toggleFeature}
-                            />
-                        </Form>
+                        <Button onClick={saveSvg}>
+                            下載圖片
+                        </Button>
+                    </Col>
+                    <Col>
+                        <Button onClick={saveCsv}>
+                            下載CSV
+                        </Button>
                     </Col>
                 </Row>
                 <Row>
@@ -136,72 +135,50 @@ const ScanCard: React.FC<ScanModeProps> = ({ toggleFeature, isPointAnimation, an
                         </Button>
                     </Col>
                 </Row>
-                {isPointAnimation ? (
-                    <>
-                        <Row>
-                            <Col>
-                            {status === "end" && (
-                                <div>
-                                    <Form.Control 
-                                        type='text' 
-                                        placeholder='輸入專案名稱' 
-                                        className='mt-4' 
-                                        required
-                                        value={projectName}
-                                        onChange={(e) => setProjectName(e.target.value)}
-                                    />
-                                    <Button className='mt-4'  size="lg" variant="success" onClick={handleStart}>
-                                        開始
-                                    </Button>
-                                </div>
-                            )}
-                            </Col>
-                        </Row>
-                        {(status === "scan" || status === "stop" ) && (
-                            <>
-                                <Row>
-                                    <Col>
-                                    { (status === "scan" ) ? (
-                                        <Button className='mt-4' size="lg" variant="info" onClick={handlePause}>
-                                            暫停
-                                        </Button>
-                                    ) : (
-                                        <Button className='mt-4' size="lg" onClick={handleResume} >
-                                            繼續
-                                        </Button>
-                                    )}
-                                    </Col>
-                                </Row>     
-                                                
-                                <Row>
-                                    <Col>
-                                        <Button className='mt-4' size="lg" variant="danger" onClick={handleEnd}>
-                                            結束
-                                        </Button>
-                                    </Col>
-                                </Row>
-                            </>
+                    <Row>
+                        <Col>
+                        {status === "end" && (
+                            <div>
+                                <Form.Control 
+                                    type='text' 
+                                    placeholder='輸入專案名稱' 
+                                    className='mt-4' 
+                                    required
+                                    value={projectName}
+                                    onChange={(e) => setProjectName(e.target.value)}
+                                />
+                                <Button className='mt-4'  size="lg" variant="success" onClick={handleStart}>
+                                    開始
+                                </Button>
+                            </div>
                         )}
-                    </>
-                ) : (
-                    <>
-                        <Row>
-                            <Col><p className='fs-3 fw-bold mt-4'>下載</p></Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <Button onClick={saveSvg}>
-                                    下載圖片
-                                </Button>
-                            </Col>
-                            <Col>
-                                <Button onClick={saveCsv}>
-                                    下載CSV
-                                </Button>
-                            </Col>
-                        </Row>
-                    </>
-                )}
+                        </Col>
+                    </Row>
+                    {(status === "scan" || status === "stop" ) && (
+                        <>
+                            <Row>
+                                <Col>
+                                { (status === "scan" ) ? (
+                                    <Button className='mt-4' size="lg" variant="info" onClick={handlePause}>
+                                        暫停
+                                    </Button>
+                                ) : (
+                                    <Button className='mt-4' size="lg" onClick={handleResume} >
+                                        繼續
+                                    </Button>
+                                )}
+                                </Col>
+                            </Row>     
+                                            
+                            <Row>
+                                <Col>
+                                    <Button className='mt-4' size="lg" variant="danger" onClick={handleEnd}>
+                                        結束
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </>
+                    )}
             </Card.Body>
         </Card>
     )

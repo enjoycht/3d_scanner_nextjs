@@ -34,20 +34,23 @@ export const MsgProvider = ({ children }: { children: ReactNode }) => {
         points: []
     });
 
-    const [points, setPoints] =useState<number[][]>([]);
+    const [points, setPoints] = useState<number[][]>([]);
 
     const [ws, setWs] = useState<WebSocket | null>(null);
 
-    useEffect(() => {
+    const connectWebSocket = () => {
         if (!url || url === "" || url === undefined || url.includes("github.io")) { return; }
         const ws = new WebSocket(window.location.protocol === "https:" ? `wss://${url}/ws` : `ws://${url}/ws`);
         setWs(ws);
+
         ws.onopen = () => {
             console.log('WebSocket connected');
         };
 
         ws.onclose = () => {
             console.log('WebSocket disconnected');
+            setStatus("disconnect");
+            setTimeout(connectWebSocket, 5000); // 每5秒重新連線
         };
 
         ws.onerror = (event) => {
@@ -67,6 +70,7 @@ export const MsgProvider = ({ children }: { children: ReactNode }) => {
                     setStatus("end");
                 }
             }
+
             if (msg["name"] !== undefined) {
                 setName(msg["name"]);
             }
@@ -79,9 +83,12 @@ export const MsgProvider = ({ children }: { children: ReactNode }) => {
                 setStopMsg(msg);
             }
         };
+    };
 
+    useEffect(() => {
+        connectWebSocket();
         return () => {
-            ws.close();
+            ws?.close();
         };
     }, [url]);
 

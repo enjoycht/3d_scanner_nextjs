@@ -248,7 +248,7 @@ const Setting = () => {
                                         <Form.Group as={Col} md="6">
                                             <Form.Label>雷射 Timeing Budget</Form.Label>
                                             <InputGroup className="mb-3">
-                                                <Form.Select defaultValue="" value={moduleData.vl53l1x_timeing_budget}
+                                                <Form.Select value={moduleData.vl53l1x_timeing_budget}
                                                     onChange={(e) => setModuleChange('vl53l1x_timeing_budget', e.target.value)}> 
                                                     <option>15</option>
                                                     <option>20</option>
@@ -319,7 +319,7 @@ const Setting = () => {
                                                     required
                                                     disabled
                                                     type="text"
-                                                    value={stopMsg.vl53l1x}
+                                                    value={stopMsg.vl53l1x === -1 ? "未安裝 vl53l1x" : stopMsg.vl53l1x}
                                                     onChange={(e) => (isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
                                                 />
                                                 <InputGroup.Text>mm</InputGroup.Text>

@@ -6,8 +6,8 @@ import Header from "./compoent/header";
 import './global.css';
 
 export const metadata: Metadata = {
-    title: "3D立體成型掃描機",
-    description: "3D立體成型掃描機",
+    title: "3D立體成形掃描機",
+    description: "3D立體成形掃描機",
 };
 
 export default function RootLayout({

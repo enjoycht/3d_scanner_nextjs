@@ -5,10 +5,12 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useUrl } from './UrlContext';
 import { useInfo } from './info';
+import { useMsg } from '../compoent/websocket';
 import Link from 'next/link';
 
 const Header = () => {
     const { url, setUrl } = useUrl();
+    const { status } = useMsg();
     const { info } = useInfo();
     const [inputUrl, setInputUrl] = useState<string>(url);
 
@@ -27,6 +29,19 @@ const Header = () => {
                     <Link className="nav-link header-link me-4" href="/OTA" passHref>OTA</Link>
                     <Link className='nav-link header-link me-4' href="/WIFI" passHref>網路</Link>
                     <Link className='nav-link header-link me-4' href="/Setting" passHref>設定</Link>
+                </Nav>
+                <Nav>
+                    {
+                        (status === "disconnect") ?
+                            <Navbar.Text className='mx-4 text-danger'>連線中</Navbar.Text> :
+                        (status === "start" || status === "scan" ) ?
+                            <Navbar.Text className='mx-4 text-success'>列印中</Navbar.Text> :
+                        (status === "stop") ?
+                            <Navbar.Text className='mx-4 text-warning'>暫停</Navbar.Text> :
+                        (status === "end") ?
+                            <Navbar.Text className='mx-4 text-info'>結束</Navbar.Text> :
+                            <Navbar.Text className='mx-4 text-secondary'>未連線</Navbar.Text>
+                    }
                 </Nav>
                 <Nav>
                     {
