@@ -1,7 +1,7 @@
 'use client';
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import { Container, Row, Col, Card, Form, Button, InputGroup } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, InputGroup, ButtonGroup } from 'react-bootstrap';
 import { useUrl } from '../compoent/UrlContext';
 import { useInfo } from '../compoent/info';
 import { useMsg } from '../compoent/websocket';
@@ -11,7 +11,7 @@ const Setting = () => {
     const { info } = useInfo();
     const { stopMsg } = useMsg();
 
-    const [zAxisSteps, setZAxisSteps] = useState(1);
+    const [zAxisSteps, setZAxisSteps] = useState(1000);
     const [moduleData, setModuleData] = useState({
         z_axis_max: "",
         z_axis_one_time_step: "",
@@ -65,39 +65,15 @@ const Setting = () => {
                 console.error('Error fetching data:', error);
             });
     }
- 
-    const zAxisUpButtonClick = () => {
-        console.log(`Z Axis Up: ${zAxisSteps}steps`);
-        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
-        axios.get(`http://${url}/api/set/scanner?command=up&step=${zAxisSteps}`)
-            .then(response => {
-                if (response.data) {
-                    console.log('ESP32 Data:', response.data);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    };
 
-    const zAxisDownButtonClick = () => {
-        console.log(`Z Axis Down: ${zAxisSteps}steps`);
+    const zAxisButtonClick = (command: string, steps: number = 1) => {
+        console.log(`Z Axis ${command}: ${steps}steps`);
         if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
-        axios.get(`http://${url}/api/set/scanner?command=down&step=${zAxisSteps<=0?1:zAxisSteps}`)
-            .then(response => {
-                if (response.data) {
-                    console.log('ESP32 Data:', response.data);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    }
-
-    const zAxisHomeButtonClick = () => {
-        console.log('Z Axis Home');
-        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
-        axios.get(`http://${url}/api/set/scanner?command=home`)
+        let myUrl = `http://${url}/api/set/scanner?command=${command}`;
+        if (command !== "home") {
+            myUrl += `&step=${steps}`;
+        }
+        axios.get(myUrl)
             .then(response => {
                 if (response.data) {
                     console.log('ESP32 Data:', response.data);
@@ -118,13 +94,26 @@ const Setting = () => {
                 <div className='d-flex flex-grow-1'>
                     <div className='d-flex flex-grow-1'>
                         <Card bg="light" className='text-center flex-grow-1 my-5 mx-4'>
-                            <Card.Header className='fs-2'>Setting</Card.Header>
+                            <Card.Header className='fs-2'>
+                                <Row>
+                                    <Col></Col>
+                                    <Col>模組參數設定</Col>
+                                    <Col>
+                                        <div className="d-grid gap-2">
+                                            <ButtonGroup as={Col} md={12}>
+                                                <Button onClick={saveButtonClick} variant='outline-success' size="lg">存檔</Button>
+                                                <Button onClick={() => axios.get(`http://${url}/api/restart`)} variant='outline-danger' size="lg">重啟</Button>
+                                            </ButtonGroup>
+                                        </div>
+                                    </Col>
+                                </Row>
+                            </Card.Header>
                             <Card.Body>
                                 <Container>
                                     <Row className='py-2'>
                                         <Form.Group as={Col} md="6">
-                                            <Form.Label>Z軸最大值</Form.Label>
-                                            <InputGroup className="mb-3">
+                                            <Form.Label>Z軸最大值(最低點至最高點微步總數)</Form.Label>
+                                            <InputGroup>
                                                 <Form.Control
                                                     required
                                                     type="text"
@@ -134,10 +123,20 @@ const Setting = () => {
                                                 />
                                                 <InputGroup.Text>微步</InputGroup.Text>
                                             </InputGroup>
+                                            <Form.Text  muted>
+                                                {"總共上升: "}
+                                                {(isNaN(parseInt(moduleData.z_axis_max))? parseFloat(moduleDataP.z_axis_max): parseFloat(moduleData.z_axis_max))}
+                                                {"微步 / "}
+                                                {(isNaN(parseInt(moduleData.z_axis_one_time_step))? parseFloat(moduleDataP.z_axis_one_time_step): parseFloat(moduleData.z_axis_one_time_step))}
+                                                {"微步 = "}
+                                                { (isNaN(parseInt(moduleData.z_axis_max))? parseFloat(moduleDataP.z_axis_max): parseFloat(moduleData.z_axis_max)) / 
+                                                  (isNaN(parseInt(moduleData.z_axis_one_time_step))? parseFloat(moduleDataP.z_axis_one_time_step): parseFloat(moduleData.z_axis_one_time_step)) }
+                                                {"次"}
+                                            </Form.Text>
                                         </Form.Group>
                                         <Form.Group as={Col} md="6">
-                                            <Form.Label>Z軸每次上升微步</Form.Label>
-                                            <InputGroup className="mb-3">
+                                            <Form.Label>Z軸每次上升微步(每微步為 0.00125 mm)</Form.Label>
+                                            <InputGroup>
                                                 <Form.Control
                                                     required
                                                     type="text"
@@ -146,11 +145,17 @@ const Setting = () => {
                                                     onChange={(e) => setModuleChange('z_axis_one_time_step', e.target.value)}
                                                 />
                                                 <InputGroup.Text>微步</InputGroup.Text>
-                                                </InputGroup>
+                                            </InputGroup>
+                                            <Form.Text muted>
+                                                {"每次上升高度: "}
+                                                {isNaN(parseInt(moduleData.z_axis_one_time_step))? parseInt(moduleDataP.z_axis_one_time_step): parseInt(moduleData.z_axis_one_time_step)}
+                                                {"微步 * 0.00125 mm = "}{(isNaN(parseInt(moduleData.z_axis_one_time_step))? parseFloat(moduleDataP.z_axis_one_time_step): parseFloat(moduleData.z_axis_one_time_step)) * 0.00125}
+                                                {"mm"}
+                                            </Form.Text>
                                         </Form.Group>
                                         <Form.Group as={Col} md="6">
-                                            <Form.Label>Z軸速度</Form.Label>
-                                            <InputGroup className="mb-3">
+                                            <Form.Label>Z軸速度(時間為2倍)</Form.Label>
+                                            <InputGroup>
                                                 <Form.Control
                                                     required
                                                     type="text"
@@ -160,11 +165,22 @@ const Setting = () => {
                                                 />
                                                 <InputGroup.Text>delayMicroseconds</InputGroup.Text>
                                             </InputGroup>
+                                            <Form.Text muted>
+                                                {"上升總時長: "}
+                                                { (isNaN(parseInt(moduleData.z_axis_max))? parseFloat(moduleDataP.z_axis_max): parseFloat(moduleData.z_axis_max))}
+                                                {"微步 * "}
+                                                { (isNaN(parseInt(moduleData.z_axis_delay_time))? parseFloat(moduleDataP.z_axis_delay_time): parseFloat(moduleData.z_axis_delay_time))}
+                                                {"µs = "}
+                                                { (isNaN(parseInt(moduleData.z_axis_max))? parseFloat(moduleDataP.z_axis_max): parseFloat(moduleData.z_axis_max)) *
+                                                  (isNaN(parseInt(moduleData.z_axis_delay_time))? parseFloat(moduleDataP.z_axis_delay_time): parseFloat(moduleData.z_axis_delay_time)) / 500000 }
+                                                {"秒"}
+                                            </Form.Text>
                                         </Form.Group>
                                         <Form.Group as={Col} md="6">
-                                            <Form.Label>Z軸初始矯正值</Form.Label>
-                                            <InputGroup className="mb-3">
+                                            <Form.Label>Z軸初始矯正值(無須調整)</Form.Label>
+                                            <InputGroup>
                                                 <Form.Control
+                                                    disabled
                                                     required
                                                     type="text"
                                                     placeholder={moduleDataP.z_axis_start_step}
@@ -178,9 +194,10 @@ const Setting = () => {
                                     </Row>
                                     <Row className='py-2'> 
                                         <Form.Group as={Col} md="6">
-                                            <Form.Label>X Y軸1圈微步</Form.Label>
-                                                <InputGroup className="mb-3">
+                                            <Form.Label>X Y軸 1 圈微步(1/32 步進馬達 1 圈為 6400 微步)</Form.Label>
+                                                <InputGroup>
                                                     <Form.Control
+                                                        disabled
                                                         required
                                                         type="text"
                                                         placeholder={moduleDataP.x_y_axis_max}
@@ -189,10 +206,19 @@ const Setting = () => {
                                                     />
                                                     <InputGroup.Text>微步</InputGroup.Text>
                                                 </InputGroup>
+                                                <Form.Text muted>
+                                                    {"每圈旋轉: "}
+                                                    {isNaN(parseInt(moduleData.x_y_axis_max))? parseInt(moduleDataP.x_y_axis_max): parseInt(moduleData.x_y_axis_max)}
+                                                    {"微步 / "}{(isNaN(parseInt(moduleData.x_y_axis_one_time_step))? parseFloat(moduleDataP.x_y_axis_one_time_step): parseFloat(moduleData.x_y_axis_one_time_step))}
+                                                    {"微步 = "}
+                                                    { (isNaN(parseInt(moduleData.x_y_axis_max))? parseFloat(moduleDataP.x_y_axis_max): parseFloat(moduleData.x_y_axis_max)) / 
+                                                    (isNaN(parseInt(moduleData.x_y_axis_one_time_step))? parseFloat(moduleDataP.x_y_axis_one_time_step): parseFloat(moduleData.x_y_axis_one_time_step)) }
+                                                    {"圈"}
+                                                </Form.Text>
                                         </Form.Group>
                                         <Form.Group as={Col} md="6">
-                                            <Form.Label>X Y軸每次上升微步</Form.Label>
-                                            <InputGroup className="mb-3">
+                                            <Form.Label>X Y軸每次旋轉微步(需是6400的因數)</Form.Label>
+                                            <InputGroup>
                                                 <Form.Control
                                                     required
                                                     type="text"
@@ -202,10 +228,16 @@ const Setting = () => {
                                                 />
                                                 <InputGroup.Text>微步</InputGroup.Text>
                                                 </InputGroup>
+                                                <Form.Text muted>
+                                                    {"每次旋轉角度: "}
+                                                    {isNaN(parseInt(moduleData.x_y_axis_one_time_step))? parseInt(moduleDataP.x_y_axis_one_time_step): parseInt(moduleData.x_y_axis_one_time_step)}
+                                                    {"微步 * 1.8度 = "}{(isNaN(parseInt(moduleData.x_y_axis_one_time_step))? parseFloat(moduleDataP.x_y_axis_one_time_step): parseFloat(moduleData.x_y_axis_one_time_step)) * 1.8}
+                                                    {"度"}
+                                                </Form.Text>
                                         </Form.Group>
                                         <Form.Group as={Col} md="6">
-                                            <Form.Label>X Y軸速度</Form.Label>
-                                            <InputGroup className="mb-3">
+                                            <Form.Label>X Y軸速度(每轉一次需要等待雷射測距測量完畢)</Form.Label>
+                                            <InputGroup>
                                                 <Form.Control
                                                     required
                                                     type="text"
@@ -215,10 +247,30 @@ const Setting = () => {
                                                 />
                                                 <InputGroup.Text>delayMicroseconds</InputGroup.Text>
                                             </InputGroup>
+                                            <Form.Text muted>
+                                                {"每1圈旋轉時間: "}
+                                                { (isNaN(parseInt(moduleData.x_y_axis_max))? parseFloat(moduleDataP.x_y_axis_max): parseFloat(moduleData.x_y_axis_max))}
+                                                {"微步 * "}
+                                                { (isNaN(parseInt(moduleData.x_y_axis_step_delay_time))? parseFloat(moduleDataP.x_y_axis_step_delay_time): parseFloat(moduleData.x_y_axis_step_delay_time))}
+                                                {"µs + "}
+                                                {parseFloat(moduleData.vl53l1x_timeing_budget)}
+                                                {"ms * "}
+                                                { (isNaN(parseInt(moduleData.x_y_axis_max))? parseFloat(moduleDataP.x_y_axis_max): parseFloat(moduleData.x_y_axis_max)) / 
+                                                  (isNaN(parseInt(moduleData.x_y_axis_one_time_step))? parseFloat(moduleDataP.x_y_axis_one_time_step): parseFloat(moduleData.x_y_axis_one_time_step)) }
+                                                {"圈 = "}
+                                                { ((isNaN(parseInt(moduleData.x_y_axis_max))? parseFloat(moduleDataP.x_y_axis_max): parseFloat(moduleData.x_y_axis_max)) *
+                                                   (isNaN(parseInt(moduleData.x_y_axis_step_delay_time))? parseFloat(moduleDataP.x_y_axis_step_delay_time): parseFloat(moduleData.x_y_axis_step_delay_time)) / 500000 ) + 
+                                                  ((parseFloat(moduleData.vl53l1x_timeing_budget) / 1000) * 
+                                                   (isNaN(parseInt(moduleData.x_y_axis_max))? parseFloat(moduleDataP.x_y_axis_max): parseFloat(moduleData.x_y_axis_max)) / 
+                                                   (isNaN(parseInt(moduleData.x_y_axis_one_time_step))? parseFloat(moduleDataP.x_y_axis_one_time_step): parseFloat(moduleData.x_y_axis_one_time_step))) *
+                                                   (isNaN(parseInt(moduleData.x_y_axis_check_times))? parseFloat(moduleDataP.x_y_axis_check_times): parseFloat(moduleData.x_y_axis_check_times))}
+                                                {"秒"}
+                                            </Form.Text>
+
                                         </Form.Group>
                                         <Form.Group as={Col} md="6">
-                                            <Form.Label>X Y軸掃描次數</Form.Label>
-                                            <InputGroup className="mb-3">
+                                            <Form.Label>X Y軸掃描次數(越大越準 1~5)</Form.Label>
+                                            <InputGroup>
                                                 <Form.Control
                                                     required
                                                     type="text"
@@ -232,9 +284,22 @@ const Setting = () => {
                                         <div className="border-bottom border-2 p-2" />
                                     </Row>
                                     <Row className='py-2'>
-                                        <Form.Group as={Col} md="6">
+                                        <Form.Group as={Col} md="4">
+                                            <Form.Label>雷射測距</Form.Label>
+                                            <InputGroup>
+                                                <Form.Control
+                                                    required
+                                                    disabled
+                                                    type="text"
+                                                    value={stopMsg.vl53l1x === -1 ? "未安裝 vl53l1x" : stopMsg.vl53l1x}
+                                                    onChange={(e) => (isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
+                                                />
+                                                <InputGroup.Text>mm</InputGroup.Text>
+                                            </InputGroup>
+                                        </Form.Group>
+                                        <Form.Group as={Col} md="4">
                                             <Form.Label>雷射中心點</Form.Label>
-                                            <InputGroup className="mb-3">
+                                            <InputGroup>
                                                 <Form.Control
                                                     required
                                                     type="text"
@@ -245,9 +310,9 @@ const Setting = () => {
                                                 <InputGroup.Text>mm</InputGroup.Text>
                                             </InputGroup>
                                         </Form.Group>
-                                        <Form.Group as={Col} md="6">
+                                        <Form.Group as={Col} md="4">
                                             <Form.Label>雷射 Timeing Budget</Form.Label>
-                                            <InputGroup className="mb-3">
+                                            <InputGroup>
                                                 <Form.Select value={moduleData.vl53l1x_timeing_budget}
                                                     onChange={(e) => setModuleChange('vl53l1x_timeing_budget', e.target.value)}> 
                                                     <option>15</option>
@@ -261,16 +326,22 @@ const Setting = () => {
                                             </InputGroup>
                                         </Form.Group>
                                     </Row>
-                                    <Row className='py-2 d-grid gap-2s'>
-                                        <Col>
-                                            <div className="d-grid gap-2">
-                                                <Button onClick={saveButtonClick} variant='success'>存檔</Button>
-                                            </div>
-                                        </Col>
-                                    </Row>
                                     <div className="border-bottom border-2 p-2" />
                                     <Row className='py-2'>
-                                        <Col md={6}> 
+                                        <Form.Group as={Col} md={4}>
+                                            <Form.Label>目前Z軸位置</Form.Label>
+                                            <InputGroup className="mb-4">
+                                                <Form.Control
+                                                    required
+                                                    disabled
+                                                    type="text"
+                                                    value={stopMsg.z_steps}
+                                                    onChange={(e) => (isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
+                                                />
+                                                <InputGroup.Text> / 47000</InputGroup.Text>
+                                            </InputGroup>
+                                        </Form.Group>
+                                        <Form.Group as={Col} md={4}>
                                             <Form.Label as={Col}>Z軸步數</Form.Label>
                                             <Form.Group as={Col}>
                                                 <InputGroup className="mb-3">
@@ -287,43 +358,13 @@ const Setting = () => {
                                                     <InputGroup.Text>微步</InputGroup.Text>
                                                 </InputGroup>
                                             </Form.Group>
-                                       </Col>
-                                        <Col md={2}>
-                                            <Button onClick={zAxisUpButtonClick} className='mt-4' size="lg">Z軸 往上</Button>
-                                        </Col>
-                                        <Col md={2}>
-                                            <Button onClick={zAxisHomeButtonClick} className='mt-4' size="lg">Z軸 歸位</Button>
-                                        </Col>
-                                        <Col md={2}>
-                                            <Button onClick={zAxisDownButtonClick} className='mt-4' size="lg"> Z軸 往下</Button>
-                                        </Col>
-                                    </Row>
-                                    <Row className='py-2'>
-                                        <Form.Group as={Col} md="6">
-                                            <Form.Label>目前Z軸位置</Form.Label>
-                                            <InputGroup className="mb-3">
-                                                <Form.Control
-                                                    required
-                                                    disabled
-                                                    type="text"
-                                                    value={stopMsg.z_steps}
-                                                    onChange={(e) => (isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
-                                                />
-                                                <InputGroup.Text> / 47000</InputGroup.Text>
-                                            </InputGroup>
                                         </Form.Group>
-                                        <Form.Group as={Col} md="6">
-                                            <Form.Label>雷射測距</Form.Label>
-                                            <InputGroup className="mb-3">
-                                                <Form.Control
-                                                    required
-                                                    disabled
-                                                    type="text"
-                                                    value={stopMsg.vl53l1x === -1 ? "未安裝 vl53l1x" : stopMsg.vl53l1x}
-                                                    onChange={(e) => (isNaN(parseInt(e.target.value))? 1: parseInt(e.target.value))}
-                                                />
-                                                <InputGroup.Text>mm</InputGroup.Text>
-                                            </InputGroup>
+                                        <Form.Group as={Col} md={4}>
+                                            <ButtonGroup as={Col} md={12}>
+                                                <Button onClick={() => zAxisButtonClick("up", zAxisSteps)} variant="outline-primary" className='mt-4' size="lg">往上</Button>
+                                                <Button onClick={() => zAxisButtonClick("home")} variant="outline-primary" className='mt-4' size="lg">歸位</Button>
+                                                <Button onClick={() => zAxisButtonClick("down", zAxisSteps)} variant="outline-primary" className='mt-4' size="lg">往下</Button>
+                                            </ButtonGroup>
                                         </Form.Group>
                                     </Row>
                                 </Container>

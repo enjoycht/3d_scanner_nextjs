@@ -1,11 +1,12 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useUrl } from './UrlContext';
+import { useInfo } from './info';
 
 interface MsgContextType {
     stopMsg: { z_steps: number; vl53l1x: number; };
     setStopMsg: (newMsg: any) => void;
-    scanMsg: { name: string; points_count: number; is_last: boolean; points: number[][] };
+    scanMsg: { name: string; points_count: number; is_last: boolean; z_steps: number; r: number; points: number[][], time: number };
     setScanMsg: (newMsg: any) => void;
     points: number[][];
     setPoints: (newPoints: number[][]) => void;
@@ -20,7 +21,9 @@ export const MsgContext = createContext<MsgContextType | undefined>(undefined);
 
 export const MsgProvider = ({ children }: { children: ReactNode }) => {
     const { url, setUrl } = useUrl();
-    const [status, setStatus] = useState<string>("");
+    const { getInfo } = useInfo();
+
+    const [status, setStatus] = useState<string>("disconnect");
     const [name, setName] = useState<string>("");
 
     const [stopMsg, setStopMsg] = useState({
@@ -31,6 +34,9 @@ export const MsgProvider = ({ children }: { children: ReactNode }) => {
         name: "",
         points_count: 0,
         is_last: false,
+        z_steps: 0,
+        r: 0,
+        time: 0,
         points: []
     });
 
@@ -45,6 +51,7 @@ export const MsgProvider = ({ children }: { children: ReactNode }) => {
 
         ws.onopen = () => {
             console.log('WebSocket connected');
+            getInfo();
         };
 
         ws.onclose = () => {

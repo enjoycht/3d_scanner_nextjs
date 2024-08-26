@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ScanCard from './compoent/ScanCard';
 import { Container, Row, Col } from 'react-bootstrap';

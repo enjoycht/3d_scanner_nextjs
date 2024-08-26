@@ -93,7 +93,7 @@ const OTA = () => {
                 <div className='d-flex flex-grow-1'>
                     <div className='d-flex flex-grow-1'>
                         <Card bg="light" className='flex-grow-1 my-5 mx-4'>
-                            <Card.Header className='text-center'>OTA</Card.Header>
+                            <Card.Header className='text-center fs-2'>Github OTA 雲端無線韌體更新</Card.Header>
                             <Card.Body>
                                 <Form>
                                     <Row className="mb-3">
@@ -115,24 +115,29 @@ const OTA = () => {
                                                 />
                                             </InputGroup>
                                         </Col>
-                                        <Col md={2} className='text-center'>
-                                            <Button onClick={statusOTAUpdate}>即時更新</Button>
+                                        <Col  md={3} className='text-center'>
+                                            <div className="d-grid gap-2">
+                                                <ButtonGroup as={Col} md={12}>
+                                                    <Button variant='outline-success' onClick={statusOTAUpdate}>即時更新</Button>
+                                                    <Button variant='outline-success' onClick={espOTAUpdate}>即時更新並上傳</Button>
+                                                </ButtonGroup>
+                                            </div>
                                         </Col>
-                                        <Col md={2} className='text-center'>
-                                            <Button onClick={espOTAUpdate}>即時更新並上傳</Button>
-                                        </Col>
-                                        <Col xs={2}>
-                                            <Form.Select onChange={handleReleaseChange} defaultValue={releases.length > 0 ? releases[0]["tag_name"] : "v0.0.0"} >
-                                            { 
-                                                (releases.length > 0) ? (
-                                                    releases.map((release, index) => (
-                                                        <option key={release["id"]} value={index} >{release["tag_name"]}</option>
-                                                    ))
-                                                ) : (
-                                                    <option value="0">v0.0.0</option>
-                                                )
-                                            }
-                                            </Form.Select>
+                                        <Col md={3}>
+                                            <InputGroup className='mx-2'>
+                                                <InputGroup.Text >版本:</InputGroup.Text>
+                                                <Form.Select onChange={handleReleaseChange} defaultValue={releases.length > 0 ? releases[0]["tag_name"] : "v0.0.0"} >
+                                                    { 
+                                                        (releases.length > 0) ? (
+                                                            releases.map((release, index) => (
+                                                                <option key={release["id"]} value={index} >{release["tag_name"]}</option>
+                                                            ))
+                                                        ) : (
+                                                            <option value="0">v0.0.0</option>
+                                                        )
+                                                    }
+                                                    </Form.Select>
+                                            </InputGroup>
                                         </Col>
                                     </Row>
                                 </Form>
@@ -141,13 +146,12 @@ const OTA = () => {
                                         <Row className='p-2'>
                                             {
                                                 (releases.length > 0) ? 
-                                                    <h1>{releases[index]["name"]}</h1> :
+                                                    <a className='fs-2 link-dark' style={{textDecoration: 'none'}} href={releases[index]['html_url']}>{releases[index]["name"]}</a> :
                                                     <h1></h1>
                                             }
                                         </Row>
                                         <Row className='p-2'>   
                                             <Col md="5">
-                                            {/* https://avatars.githubusercontent.com/in/15368?s=40&v=4 */}
                                                 <Image
                                                     src={(releases.length > 0) ? 
                                                         (releases[index]["author"]["login"] === "github-actions[bot]") ? `https://avatars.githubusercontent.com/in/15368?s=40&v=4` : 

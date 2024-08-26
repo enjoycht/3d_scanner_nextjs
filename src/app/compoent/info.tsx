@@ -6,6 +6,7 @@ import { useUrl } from './UrlContext';
 interface InfoContextType {
     info: any;
     setInfo: (newInfo: any) => void;
+    getInfo: () => void;
 }
 
 // Create the context
@@ -47,21 +48,27 @@ export const InfoProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         if (!url || url === "" || url === undefined || url.includes("github.io")) { return; }
+        getInfo();
+    }, [url]);
+
+    const getInfo = () => {
+        if (!url || url === "" || url === undefined || url.includes("github.io")) { return; }
         axios.get(`http://${url}/api/info`)
             .then(response => {
+                console.log(response.data);
                 setInfo(response.data["data"]);
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
-    }, [url]);
+    };
 
     const setInfo = (newInfo: any) => {
         setInfoState(newInfo);
     };
 
     return (
-        <InfoContext.Provider value={{ info, setInfo }}>
+        <InfoContext.Provider value={{ info, setInfo, getInfo }}>
             {children}
         </InfoContext.Provider>
     );
