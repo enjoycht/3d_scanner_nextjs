@@ -315,12 +315,13 @@ const Setting = () => {
                                             <InputGroup>
                                                 <Form.Select value={moduleData.vl53l1x_timeing_budget}
                                                     onChange={(e) => setModuleChange('vl53l1x_timeing_budget', e.target.value)}> 
-                                                    <option>15</option>
-                                                    <option>20</option>
-                                                    <option>33</option>
-                                                    <option>50</option>
-                                                    <option>100</option>
-                                                    <option>500</option>
+                                                    <option value={15} className='text-info'>15 (VL53L1X)</option>
+                                                    <option value={20} className='text-primary'>20 (VL53L0X, VL53L1X)</option>
+                                                    <option value={33} className='text-primary'>33 (VL53L0X, VL53L1X)</option>
+                                                    <option value={50} className='text-info'>50 (VL53L1X)</option>
+                                                    <option value={100} className='text-info'>100 (VL53L1X)</option>
+                                                    <option value={200} className='text-success'>200 (VL53L0X)</option>
+                                                    <option value={500} className='text-info'>500 (VL53L1X)</option>
                                                 </Form.Select>
                                                 <InputGroup.Text>ms</InputGroup.Text>
                                             </InputGroup>
