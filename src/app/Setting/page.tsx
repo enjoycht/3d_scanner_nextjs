@@ -213,7 +213,7 @@ const Setting = () => {
                                                     {"微步 = "}
                                                     { (isNaN(parseInt(moduleData.x_y_axis_max))? parseFloat(moduleDataP.x_y_axis_max): parseFloat(moduleData.x_y_axis_max)) / 
                                                     (isNaN(parseInt(moduleData.x_y_axis_one_time_step))? parseFloat(moduleDataP.x_y_axis_one_time_step): parseFloat(moduleData.x_y_axis_one_time_step)) }
-                                                    {"圈"}
+                                                    {"次"}
                                                 </Form.Text>
                                         </Form.Group>
                                         <Form.Group as={Col} md="6">
@@ -229,9 +229,9 @@ const Setting = () => {
                                                 <InputGroup.Text>微步</InputGroup.Text>
                                                 </InputGroup>
                                                 <Form.Text muted>
-                                                    {"每次旋轉角度: "}
+                                                    {"每次旋轉角度: (1.8度 / 32微步) *"}
                                                     {isNaN(parseInt(moduleData.x_y_axis_one_time_step))? parseInt(moduleDataP.x_y_axis_one_time_step): parseInt(moduleData.x_y_axis_one_time_step)}
-                                                    {"微步 * 1.8度 = "}{(isNaN(parseInt(moduleData.x_y_axis_one_time_step))? parseFloat(moduleDataP.x_y_axis_one_time_step): parseFloat(moduleData.x_y_axis_one_time_step)) * 1.8}
+                                                    {"微步 *  = "}{(isNaN(parseInt(moduleData.x_y_axis_one_time_step))? parseFloat(moduleDataP.x_y_axis_one_time_step): parseFloat(moduleData.x_y_axis_one_time_step)) * (1.8 / 32)}
                                                     {"度"}
                                                 </Form.Text>
                                         </Form.Group>
