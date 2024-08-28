@@ -88,34 +88,6 @@ const WiFi = () => {
                                         </Form.Group>
                                         <div className="border-bottom border-2 p-2" />
                                     </Row>
-                                    <Row className='py-2 mb-5'>
-                                        <Form.Group as={Col} md="6">
-                                            <Form.Label>STA 帳號</Form.Label>
-                                            <Form.Control
-                                                required
-                                                type="text"
-                                                placeholder={info["sta"]["ssid"]}
-                                                defaultValue={staDefault}
-                                                onChange={(e) => setStaDefault(e.target.value)}
-                                            />
-                                        </Form.Group>
-                                        <Form.Group as={Col} md="6">
-                                            <Form.Label>STA 密碼</Form.Label>
-                                            <InputGroup className="mb-3">
-                                                <Form.Control
-                                                    required
-                                                    type={showPassword}
-                                                    defaultValue={staPasswordDefault === '' ? info["sta"]["password"] : staPasswordDefault}
-                                                    onChange={(e) => setStaPasswordDefault(e.target.value)}
-                                                />
-                                                <Button variant="outline-secondary" id="button-addon1" 
-                                                onClick={() => setShowPassword(prevState => (prevState === "password" ? "text" : "password"))}>
-                                                    {(showPassword === "password") ? "顯示密碼" : "隱藏密碼"}
-                                                </Button>
-                                            </InputGroup>
-                                        </Form.Group>
-                                        <div className="border-bottom border-2 p-2" />
-                                    </Row>
                                     <Row className='py-2  mb-5'>
                                         <Form.Group as={Col} md="6">
                                             <Form.Label>AP 帳號</Form.Label>
