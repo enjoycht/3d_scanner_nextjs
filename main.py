@@ -17,6 +17,8 @@ def main():
     with open("website.h", "w") as f:
         f.write(c_code)
 
+    delete_files(files)
+
 def get_all_file_info(directory):
     file_info_list = []
     for root, dirs, files in os.walk(directory):
@@ -33,7 +35,7 @@ def gzip_files(files):
         filename = file['filepath']
 
         with open(filename, 'rb') as f_in:
-            with gzip.open(f'{filename}.gz', 'wb') as f_out:
+            with gzip.open(f'{filename}.gz', 'wb', compresslevel=9) as f_out:
                 f_out.writelines(f_in)
         file['filepath_gz'] = f'{filename}.gz'
 
@@ -83,6 +85,8 @@ def generate_c_code(file_list):
         if "filepath_gz" in f:
             c_code += f'    AsyncWebServerResponse *response = request->beginResponse_P(200, "{get_mime_type(f["filename"])}", {get_variable_name(f["filename"])}, {get_variable_name(f["filename"])}_len); \\\n'
             c_code += f'    response->addHeader("Content-Encoding", "gzip"); \\\n'
+            if f['filename'].endswith('.js') or f['filename'].endswith('.css'):
+                c_code += f'    response->addHeader("Cache-Control", "max-age=31536000, immutable"); \\\n'
         else:
             c_code += f'    AsyncWebServerResponse *response = request->beginResponse_P(200, "{get_mime_type(f["filename"])}", {get_variable_name(f["filename"])}, {get_variable_name(f["filename"])}_len); \\\n'
         c_code += f'    request->send(response);\\\n}}); \\\n\\\n'
@@ -109,6 +113,15 @@ def get_mime_type(filename):
         return "image/x-icon"
     else:
         return "application/octet-stream"
+
+def delete_files(file_list):
+    for f in file_list:
+        if 'filepath_gz' in f:
+            try:
+                os.remove(f['filepath_gz'])
+                print(f"Deleted: {f['filepath_gz']}")
+            except OSError as e:
+                print(f"Error deleting {f['filepath_gz']}: {e}")
     
 if __name__ == "__main__":
     main()
