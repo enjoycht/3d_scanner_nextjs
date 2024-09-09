@@ -1,84 +1,144 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
-import { useUrl } from './UrlContext';
+
+import React, { createContext , useContext , useState , useEffect , ReactNode } from 'react' ;
+import axios from 'axios' ; 
+import { useUrl } from './UrlContext' ;
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 interface InfoContextType {
-    info: any;
-    setInfo: (newInfo: any) => void;
-    getInfo: () => void;
+
+    info: any ;
+    setInfo: ( newInfo: any ) => void ;
+    getInfo: () => void ;
+
 }
 
-// Create the context
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// ~~~~~~ Create the context
 export const InfoContext = createContext<InfoContextType | undefined>(undefined);
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 export const InfoProvider = ({ children }: { children: ReactNode }) => {
-    const { url, setUrl } = useUrl();
-    const [info, setInfoState] = useState({
-        code: -1,
-        status: "",
-        path: "",
-        version: "",
-        mdns: "",
+    const { url , setUrl } = useUrl() ;
+    const [info , setInfoState] = useState({
+
+        code: -1 ,
+        status: "" ,
+        path: "" ,
+        version: "" ,
+        mdns: "" ,
+
         sta: {
-            ssid: "",
-            password: "",
-        },
+
+            ssid: "" ,
+            password: "" ,
+ 
+        } ,
+
         ap: {
-            ssid: "",
-            password: "",
+
+            ssid: "" ,
+            password: "" ,
+
         },
+
         github: {
-            username: "",
+
+            username: "" ,
             repo: ""
-        },
+
+        } ,
+
         module: {
-            z_axis_max: "",
-            z_axis_one_time_step: "",
-            z_axis_delay_time: "",
-            z_axis_start_step: "",
-            x_y_axis_max: "",
-            x_y_axis_check_times: "",
-            x_y_axis_one_time_step: "",
-            x_y_axis_step_delay_time: "",
-            vl53l1x_center: "",
+
+            z_axis_max: "" ,
+            z_axis_one_time_step: "" ,
+            z_axis_delay_time: "" ,
+            z_axis_start_step: "" ,
+            x_y_axis_max: "" ,
+            x_y_axis_check_times: "" ,
+            x_y_axis_one_time_step: "" ,
+            x_y_axis_step_delay_time: "" ,
+            vl53l1x_center: "" ,
             vl53l1x_timeing_budget: ""
+
         }
-    });
+
+    } ) ;
 
     useEffect(() => {
-        if (!url || url === "" || url === undefined || url.includes("github.io")) { return; }
-        getInfo();
-    }, [url]);
+
+        if ( !url || url === "" || url === undefined || url.includes ( "github.io" ) ) { 
+        
+            return; 
+        
+        }
+
+        getInfo () ;
+
+    } , [ url ] ) ;
 
     const getInfo = () => {
-        if (!url || url === "" || url === undefined || url.includes("github.io")) { return; }
+
+        if ( !url || url === "" || url === undefined || url.includes( "github.io" ) ) { 
+        
+            return ; 
+        	
+        }
+
         axios.get(`http://${url}/api/info`)
+
             .then(response => {
-                console.log(response.data);
-                setInfo(response.data["data"]);
-            })
+
+                console.log ( response.data ) ;
+                setInfo ( response.data [ "data" ] ) ;
+
+            } )
+
             .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    };
+
+                console.error ( 'Error fetching data:' , error ) ;
+
+            } ) ;
+
+    } ;
 
     const setInfo = (newInfo: any) => {
-        setInfoState(newInfo);
-    };
+
+        setInfoState ( newInfo ) ;
+
+    } ;
 
     return (
-        <InfoContext.Provider value={{ info, setInfo, getInfo }}>
-            {children}
-        </InfoContext.Provider>
-    );
-};
 
-// Custom hook to use the InfoContext
+        <InfoContext.Provider value = { { info , setInfo , getInfo } } >
+
+            { children }
+
+        </InfoContext.Provider>
+
+    ) ;
+
+} ;
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// ~~~~~~ Custom hook to use the InfoContext
 export const useInfo = () => {
-    const context = useContext(InfoContext);
-    if (!context) {
-        throw new Error('useInfo must be used within an InfoProvider');
+
+    const context = useContext ( InfoContext ) ;
+
+    if ( !context ) {
+
+        throw new Error ( 'useInfo must be used within an InfoProvider' ) ;
+
     }
-    return context;
-};
+
+    return context ;
+
+} ;
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
