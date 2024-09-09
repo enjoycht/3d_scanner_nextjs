@@ -1,94 +1,151 @@
 'use client';
-import React, {useState, useEffect} from 'react';
-import axios from 'axios';
-import { Container, Row, Col, Card, Form, Button, InputGroup, ButtonGroup } from 'react-bootstrap';
-import { useUrl } from '../compoent/UrlContext';
-import { useInfo } from '../compoent/info';
-import { useMsg } from '../compoent/websocket';
 
-const Setting = () => {
-    const { url } = useUrl();
-    const { info } = useInfo();
-    const { stopMsg } = useMsg();
+import React , { useState , useEffect } from 'react' ;
+import axios from 'axios' ;
+import { Container , Row , Col , Card , Form , Button , InputGroup , ButtonGroup } from 'react-bootstrap' ;
+import { useUrl } from '../compoent/UrlContext' ;
+import { useInfo } from '../compoent/info' ;
+import { useMsg } from '../compoent/websocket' ;
 
-    const [zAxisSteps, setZAxisSteps] = useState(1000);
-    const [moduleData, setModuleData] = useState({
-        z_axis_max: "",
-        z_axis_one_time_step: "",
-        z_axis_delay_time: "",
-        z_axis_start_step: "",
-        x_y_axis_max: "",
-        x_y_axis_check_times: "",
-        x_y_axis_one_time_step: "",
-        x_y_axis_step_delay_time: "",
-        vl53l1x_center: "",
-        vl53l1x_timeing_budget: ""
-    });
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    const [moduleDataP, setModuleDataP] = useState({
-        z_axis_max: "",
-        z_axis_one_time_step: "",
-        z_axis_delay_time: "",
-        z_axis_start_step: "",
-        x_y_axis_max: "",
-        x_y_axis_check_times: "",
-        x_y_axis_one_time_step: "",
-        x_y_axis_step_delay_time: "",
-        vl53l1x_center: "",
-        vl53l1x_timeing_budget: ""
-    });
+const Setting = () => { 
 
-    useEffect(() => {
-        setModuleDataP(info['module']);
-        setModuleChange('vl53l1x_timeing_budget', info['module']['vl53l1x_timeing_budget']);
-    }, [info]);
+		const { url } = useUrl () ;
+		const { info } = useInfo () ;
+		const { stopMsg } = useMsg () ;
 
-    const saveButtonClick = () => {
-        let param = "";
-        for (const key in moduleData) {
-            if (moduleData[key as keyof typeof moduleData] === ""){
-                param += `${key}=${moduleDataP[key as keyof typeof moduleDataP]}&`;
-            } else {
-                param += `${key}=${moduleData[key as keyof typeof moduleData]}&`;
-            }
-        }
-        param = param.slice(0, -1);
-        console.log(`Save Setting: ${param}`);
-        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
-        axios.get(`http://${url}/api/set/data?${param}`)
-            .then(response => {
-                if (response.data) {
-                    console.log('ESP32 Data:', response.data);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    }
+		const [ zAxisSteps , setZAxisSteps ] = useState ( 1000 ) ;
+		const [ moduleData , setModuleData ] = useState ( { 
 
-    const zAxisButtonClick = (command: string, steps: number = 1) => {
-        console.log(`Z Axis ${command}: ${steps}steps`);
-        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
+				z_axis_max: "" , 
+				z_axis_one_time_step: "" , 
+				z_axis_delay_time: "" , 
+				z_axis_start_step: "" , 
+				x_y_axis_max: "" , 
+				x_y_axis_check_times: "" , 
+				x_y_axis_one_time_step: "" , 
+				x_y_axis_step_delay_time: "" , 
+				vl53l1x_center: "" , 
+				vl53l1x_timeing_budget: ""
+
+		} ) ;
+
+		const [ moduleDataP , setModuleDataP ] = useState ( { 
+
+				z_axis_max: "" , 
+				z_axis_one_time_step: "" , 
+				z_axis_delay_time: "" , 
+				z_axis_start_step: "" , 
+				x_y_axis_max: "" , 
+				x_y_axis_check_times: "" , 
+				x_y_axis_one_time_step: "" , 
+				x_y_axis_step_delay_time: "" , 
+				vl53l1x_center: "" , 
+				vl53l1x_timeing_budget: ""
+
+
+		} ) ;
+
+		useEffect ( () => { 
+
+				setModuleDataP ( info [ 'module' ] ) ;
+				setModuleChange ( 'vl53l1x_timeing_budget' , info [ 'module' ] [ 'vl53l1x_timeing_budget' ] ) ;
+
+		} , [ info ] ) ;
+
+		const saveButtonClick = () => { 
+
+				let param = "" ;
+
+				for ( const key in moduleData ) { 
+
+						if ( moduleData [ key as keyof typeof moduleData ] === "" ) { 
+
+								param += `$ { key } = $ { moduleDataP [ key as keyof typeof moduleDataP ] } &` ;
+
+						} else { 
+
+								param += `$ { key } = $ { moduleData [ key as keyof typeof moduleData ] } &` ;
+
+						} 
+
+				} 
+
+				param = param.slice ( 0 , -1 ) ;
+				console.log ( `Save Setting: $ { param } ` ) ;
+
+				if ( !url || url == = "" || url == = undefined || url.includes ( "github.io" ) || url.includes ( "github.dev" ) ) { 
+					
+						return ;
+						
+				} ;
+
+        axios.get ( `http://${url}/api/set/data?${param}`)
+
+						.then ( response => { 
+
+								if ( response.data ) { 
+
+										console.log ( 'ESP32 Data:' , response.data ) ;
+
+								} 
+
+						} ) 
+
+						.catch ( error => { 
+
+								console.error ( 'Error fetching data:' , error ) ;
+
+						} ) ;
+
+		} 
+
+		const zAxisButtonClick = ( command: string , steps: number = 1 ) => { 
+
+				console.log ( `Z Axis $ { command }: $ { steps } steps` ) ;
+
+				if ( !url || url == = "" || url == = undefined || url.includes ( "github.io" ) || url.includes ( "github.dev" ) ) { 
+					
+				    return ; 
+				    
+				} ;
+
         let myUrl = `http://${url}/api/set/scanner?command=${command}`;
-        if (command !== "home") {
-            myUrl += `&step=${steps}`;
-        }
-        axios.get(myUrl)
-            .then(response => {
-                if (response.data) {
-                    console.log('ESP32 Data:', response.data);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    }
 
-    const setModuleChange = (key: string, value: string) => {
-        setModuleData(prevData => { return { ...prevData, [key]: value } });
-    }
+				if ( command !== "home" ) { 
+
+						myUrl += `&step = $ { steps } ` ;
+
+				} 
+
+				axios.get ( myUrl ) 
+
+						.then ( response => { 
+
+								if ( response.data ) { 
+
+										console.log ( 'ESP32 Data:' , response.data ) ;
+
+								} 
+
+						} ) 
+
+						.catch ( error => { 
+
+								console.error ( 'Error fetching data:' , error ) ;
+
+						} ) ;
+		} 
+
+		const setModuleChange = ( key: string , value: string ) => { 
+
+				setModuleData ( prevData => { return { ...prevData , [ key ]: value } } ) ;
+
+		} 
 
     return (
+
         <main className='d-flex'> 
             <Container className='flex-grow-1 d-flex'>
                 <div className='d-flex flex-grow-1'>
@@ -375,6 +432,13 @@ const Setting = () => {
                 </div>
             </Container>
         </main>
-    );
+
+    ) ;
+
 }
-export default Setting;
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+export default Setting ;
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
