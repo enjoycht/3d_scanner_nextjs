@@ -1,93 +1,143 @@
 'use client';
-import axios from 'axios';
-import remarkHtml from 'remark-html';
-import remarkParse from 'remark-parse'
-import {unified} from 'unified'
-import React, { useEffect, useState } from 'react';
-import { VFile } from 'vfile';
-import { Container, Row, Col, Card, Form, InputGroup, Image, Button, ButtonGroup } from 'react-bootstrap';
-import { useUrl } from '../compoent/UrlContext';
-import { useInfo } from '../compoent/info';
 
-const OTA = () => {
-    const { url } = useUrl();
-    const { info } = useInfo()
+import axios from 'axios' ;
+import remarkHtml from 'remark - html' ;
+import remarkParse from 'remark - parse'
+import { unified } from 'unified'
+import React , { useEffect , useState } from 'react' ;
+import { VFile } from 'vfile' ;
+import { Container , Row , Col , Card , Form , InputGroup , Image , Button , ButtonGroup } from 'react - bootstrap' ;
+import { useUrl } from '.. / compoent / UrlContext' ;
+import { useInfo } from '.. / compoent / info' ;
 
-    const [github, setGithub] = useState({ "username": "", "repo": "", });
-    const [githubInput, setGithubInput] = useState({ "username": "", "repo": "", });
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    const [releases, setReleases] = useState([]);
-    const [index, setIndex] = useState(0);
-    const [assets, setAssets] = useState([]);
-    const [file, setFile] = useState<VFile | undefined>(undefined);
+const OTA = () => { 
 
-    const handleReleaseChange = async(event: React.ChangeEvent<HTMLSelectElement>) => {
-        setIndex(parseInt(event.target.value));
-        setAssets(releases[parseInt(event.target.value)]["assets"]);
-        const file = await unified()
-            .use(remarkParse)
-            .use(remarkHtml)
-            .process(releases[parseInt(event.target.value)]["body"]);
-        setFile(file);
-    }
+		const { url } = useUrl () ;
+		const { info } = useInfo () 
 
-    const flash = (type: string, id: number) => {
-        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
-        axios.get(`http://${url}/api/ota?type=${type}&username=${github.username}&repo=${github.repo}&id=${id}`)
-            .then((response) => {
-                console.log(response.data);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    }
+		const [ github , setGithub ] = useState ( { "username": "" , "repo": "" , } ) ;
+		const [ githubInput , setGithubInput ] = useState ( { "username": "" , "repo": "" , } ) ;
 
-    useEffect(() => {
-        setGithub(info['github']);
-    }, [info]);
+		const [ releases , setReleases ] = useState ( [ ] ) ;
+		const [ index , setIndex ] = useState ( 0 ) ;
+		const [ assets , setAssets ] = useState ( [ ] ) ;
+		const [ file , setFile ] = useState<VFile | undefined> ( undefined ) ;
 
-    useEffect(() => {
-        if (github.username !== "" && github.repo !== "") {
-            // Get the Release List information 
-            axios.get(`https://api.github.com/repos/${github.username}/${github.repo}/releases`, 
+		const handleReleaseChange = async ( event: React.ChangeEvent<HTMLSelectElement> ) => { 
+
+				setIndex ( parseInt ( event.target.value ) ) ;
+				setAssets ( releases [ parseInt ( event.target.value ) ] [ "assets" ] ) ;
+
+				const file = await unified () 
+
+						.use ( remarkParse ) 
+						.use ( remarkHtml ) 
+						.process ( releases [ parseInt ( event.target.value ) ] [ "body" ] ) ;
+
+				setFile ( file ) ;
+
+		} 
+
+		const flash = ( type: string , id: number ) => { 
+
+				if ( !url || url == = "" || url == = undefined || url.includes ( "github.io" ) || url.includes ( "github.dev" ) ) { return ; } ;
+
+				axios.get ( `http://${url}/api/ota?type=${type}&username=${github.username}&repo=${github.repo}&id=${id}`)
+
+						.then ( ( response ) => { 
+
+								console.log ( response.data ) ;
+
+						} ) 
+
+						.catch ( ( error ) => { 
+
+								console.error ( error ) ;
+
+						} ) ;
+
+		} 
+
+		useEffect ( () => { 
+
+				setGithub ( info [ 'github' ] ) ;
+
+		} , [ info ] ) ;
+
+		useEffect ( () => { 
+
+				if ( github.username !== "" && github.repo !== "" ) { 
+
+            // ~~ Get the Release List information 
+            axios.get ( `https://api.github.com/repos/${github.username}/${github.repo}/releases`, 
                 {
+
                     headers: {
+
                         'Accept': 'application/vnd.github.v3+json'
-                    }
-                })
-                .then(async(response) => {
-                    console.log(response.data);
-                    setReleases(response.data);
-                    setAssets(response.data[0]["assets"]);
-                    const file = await unified()
-                        .use(remarkParse)
-                        .use(remarkHtml)
-                        .process(response.data[0]["body"]);
-                    setFile(file);
-                })
-                .catch((error) => {
-                    console.error(error);
-                });
-        }
-    }, [github]);
 
-    const statusOTAUpdate = () => {
-        setGithub(githubInput);
-    }
+										} 
 
-    const espOTAUpdate = () => {
-        setGithub(githubInput);
-        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
-        axios.get(`http://${url}/api/set/data?github_username=${githubInput.username}&github_repo=${githubInput.repo}`)
-            .then((response) => {
-                console.log(response.data);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    }
+								} ) 
+
+								.then ( async ( response ) => { 
+
+										console.log ( response.data ) ;
+										setReleases ( response.data ) ;
+										setAssets ( response.data [ 0 ] [ "assets" ] ) ;
+
+										const file = await unified () 
+
+												.use ( remarkParse ) 
+												.use ( remarkHtml ) 
+												.process ( response.data [ 0 ] [ "body" ] ) ;
+
+										setFile ( file ) ;
+
+								} ) 
+
+								.catch ( ( error ) => { 
+
+										console.error ( error ) ;
+
+								} ) ;
+
+				} 
+
+		} , [ github ] ) ;
+
+		const statusOTAUpdate = () => { 
+
+				setGithub ( githubInput ) ;
+
+		} 
+
+		const espOTAUpdate = () => { 
+
+				setGithub ( githubInput ) ;
+
+				if ( !url || url == = "" || url == = undefined || url.includes ( "github.io" ) || url.includes ( "github.dev" ) ) { return ; } ;
+
+        axios.get ( `http://${url}/api/set/data?github_username=${githubInput.username}&github_repo=${githubInput.repo}`)
+
+						.then ( ( response ) => { 
+
+								console.log ( response.data ) ;
+
+						} ) 
+
+						.catch ( ( error ) => { 
+
+								console.error ( error ) ;
+
+						} ) ;
+
+		} 
 
     return (
+
         <main className='d-flex'> 
             <Container className='flex-grow-1 d-flex'>
                 <div className='d-flex flex-grow-1'>
@@ -244,6 +294,11 @@ const OTA = () => {
                 </div>
             </Container>
         </main>
-    );
+    ) ;
 }
-export default OTA;
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+export default OTA ;
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
