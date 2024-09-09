@@ -1,44 +1,63 @@
-'use client';
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Container, Row, Col, Card, Form, Button, ButtonGroup, InputGroup} from 'react-bootstrap';
-import { useUrl } from '../compoent/UrlContext';
-import { useInfo } from '../compoent/info';
+'use client' ;
+
+import React , { useState } from 'react' ;
+import axios from 'axios' ;
+import { Container , Row , Col , Card , Form , Button , ButtonGroup , InputGroup } from 'react-bootstrap' ;
+import { useUrl } from '../compoent/UrlContext' ;
+import { useInfo } from '../compoent/info' ;
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 const WiFi = () => {
-    const { url } = useUrl();
-    const { info } = useInfo();
 
-    const [staDefault, setStaDefault] = useState<string>("");
-    const [staPasswordDefault, setStaPasswordDefault] = useState<string>("");
-    const [apDefault, setApDefault] = useState<string>("");
-    const [apPasswordDefault, setApPasswordDefault] = useState<string>("");
-    const [esp32HostnameDefault, setEsp32HostnameDefault] = useState<string>("");
-    
-    const [showPassword, setShowPassword] = useState<string>("password");
-    const [showApPassword, setShowApPassword] = useState<string>("password");
+		const { url } = useUrl () ;
+		const { info } = useInfo () ;
 
-    const saveButtonClick = () => {
-        const staSSID = staDefault === '' ? info["sta"]["ssid"] : staDefault;
-        const staPassword = staPasswordDefault === '' ? info["sta"]["password"]  : staPasswordDefault;
-        const apSSID = apDefault === '' ? info["ap"]["ssid"]  : apDefault;
-        const apPassword = apPasswordDefault === '' ? info["ap"]["password"]  : apPasswordDefault;
-        const mdns = esp32HostnameDefault === '' ? info["mdns"] : esp32HostnameDefault;
-        
-        if(!url || url === "" || url === undefined || url.includes("github.io") || url.includes("github.dev")) {return;};
-        axios.get(`http://${url}/api/set/data?sta_ssid=${staSSID}&sta_password=${staPassword}&ap_ssid=${apSSID}&ap_password=${apPassword}&mdns=${mdns}`)
+		const [ staDefault , setStaDefault ] = useState<string> ( "" ) ;
+		const [ staPasswordDefault , setStaPasswordDefault ] = useState<string> ( "" ) ;
+		const [ apDefault , setApDefault ] = useState<string> ( "" ) ;
+		const [ apPasswordDefault , setApPasswordDefault ] = useState<string> ( "" ) ;
+		const [ esp32HostnameDefault , setEsp32HostnameDefault ] = useState<string> ( "" ) ;
+		
+		const [ showPassword , setShowPassword ] = useState<string> ( "password" ) ;
+		const [ showApPassword , setShowApPassword ] = useState<string> ( "password" ) ;
+
+		const saveButtonClick = () => { 
+
+				const staSSID = staDefault === '' ? info [ "sta" ] [ "ssid" ] : staDefault ;
+				const staPassword = staPasswordDefault === '' ? info [ "sta" ] [ "password" ] : staPasswordDefault ;
+				const apSSID = apDefault === '' ? info [ "ap" ] [ "ssid" ] : apDefault ;
+				const apPassword = apPasswordDefault === '' ? info [ "ap" ] [ "password" ] : apPasswordDefault ;
+				const mdns = esp32HostnameDefault === '' ? info [ "mdns" ] : esp32HostnameDefault ;
+				
+				if ( !url || url === "" || url === undefined || url.includes ( "github.io" ) || url.includes ( "github.dev" ) ) { 
+					
+						return ;
+						
+				} ;
+
+				axios.get ( `http://${url}/api/set/data?sta_ssid=${staSSID}&sta_password=${staPassword}&ap_ssid=${apSSID}&ap_password=${apPassword}&mdns=${mdns}`)
+
             .then(response => {
+
                 if (response.data) {
-                    console.log('ESP32 Data:', response.data);
+
+                    console.log ( 'ESP32 Data:' , response.data ) ;
+
                 }
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
+
+            } )
+
+            .catch ( error => {
+
+                console.error ( 'Error fetching data:' , error ) ;
+
+            } ) ;
+
     }
 
-
     return (
+
         <main className='d-flex'> 
             <Container className='flex-grow-1 d-flex'>
                 <div className='d-flex flex-grow-1'>
@@ -136,6 +155,13 @@ const WiFi = () => {
                 </div>
             </Container>
         </main>
-    );
+
+    ) ;
+
 }
-export default WiFi;
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+export default WiFi ;
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
